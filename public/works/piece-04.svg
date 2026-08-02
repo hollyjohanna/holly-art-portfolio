@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+  <rect width="600" height="900" fill="#FFF8E7" />
+  <line x1="139.3" y1="551.0" x2="481.1" y2="639.1" stroke="#0E1104" stroke-width="5" stroke-linecap="round" />
+  <polygon points="309.7,359.1 507.1,699.6 112.2,699.6" fill="#93B5C6" stroke="#0E1104" stroke-width="6" transform="rotate(118.5 309.7 586.1)" />
+  <rect x="78.2" y="235.6" width="417.8" height="467.1" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" transform="rotate(-0.4 287.2 469.2)" />
+  <circle cx="155.9" cy="300.4" r="113.3" fill="#F4DD90" stroke="#0E1104" stroke-width="6" />
+  <rect x="73.0" y="294.1" width="378.2" height="579.2" fill="#93B5C6" stroke="#0E1104" stroke-width="6" transform="rotate(-7.6 262.1 583.7)" />
+  <line x1="266.5" y1="733.1" x2="119.3" y2="338.3" stroke="#0E1104" stroke-width="5" stroke-linecap="round" />
+  <rect x="19.7" y="6.3" width="351.0" height="568.0" fill="#C76B84" stroke="#0E1104" stroke-width="6" transform="rotate(10.0 195.2 290.3)" />
+  <polygon points="403.3,81.2 547.2,329.3 259.5,329.3" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" transform="rotate(231.8 403.3 246.6)" />
+  <rect x="4" y="4" width="592" height="892" fill="none" stroke="#0E1104" stroke-width="8" />
+</svg>
