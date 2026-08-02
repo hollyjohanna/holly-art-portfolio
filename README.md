@@ -18,7 +18,10 @@ All artwork, photos, and copy are currently **placeholders** — see
 
 ## Getting started
 
+Requires Node 20.9 or newer (Next.js refuses to build on older versions):
+
 ```bash
+nvm use v24.14.0
 npm install
 cp .env.local.example .env.local   # then fill in RESEND_API_KEY
 npm run dev
