@@ -1,9 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="850" height="600" viewBox="0 0 850 600">
   <rect width="850" height="600" fill="#93B5C6" />
-  <polygon points="101.5,143.8 253.1,405.3 -50.2,405.3" fill="#C76B84" stroke="#0E1104" stroke-width="6" transform="rotate(22.9 101.5 318.1)" />
-  <circle cx="537.2" cy="534.1" r="156.5" fill="#93B5C6" stroke="#0E1104" stroke-width="6" />
-  <rect x="74.6" y="77.3" width="505.3" height="281.3" fill="#C76B84" stroke="#0E1104" stroke-width="6" transform="rotate(-8.1 327.2 218.0)" />
-  <circle cx="446.6" cy="25.0" r="129.0" fill="#F4DD90" stroke="#0E1104" stroke-width="6" />
-  <rect x="39.2" y="329.6" width="275.5" height="187.6" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" transform="rotate(5.4 177.0 423.4)" />
-  <rect x="4" y="4" width="842" height="592" fill="none" stroke="#0E1104" stroke-width="8" />
+  <polygon points="101.5,143.8 253.1,405.3 -50.2,405.3" fill="#C76B84" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(22.9 101.5 318.1)" />
+  <circle cx="537.2" cy="534.1" r="156.5" fill="#93B5C6" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" />
+  <rect x="74.6" y="77.3" width="505.3" height="281.3" fill="#C76B84" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(-8.1 327.2 218.0)" />
+  <circle cx="446.6" cy="25.0" r="129.0" fill="#F4DD90" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" />
+  <rect x="39.2" y="329.6" width="275.5" height="187.6" fill="#FFF8E7" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(5.4 177.0 423.4)" />
 </svg>

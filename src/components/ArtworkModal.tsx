@@ -60,7 +60,7 @@ export default function ArtworkModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
           onClick={onClose}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/70 backdrop-blur-md p-4 sm:p-8"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/55 backdrop-blur-md p-4 sm:p-8"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -70,7 +70,7 @@ export default function ArtworkModal({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="absolute -top-3 -right-3 md:-top-4 md:-right-4 z-10 flex h-10 w-10 items-center justify-center border-brutal bg-cream text-lg font-semibold text-ink transition-colors duration-300 hover:bg-rose active:translate-y-[1px]"
+              className="absolute -top-3 -right-3 md:-top-4 md:-right-4 z-10 flex h-9 w-9 items-center justify-center border-hairline bg-cream text-base text-ink/70 shadow-soft transition-colors duration-300 hover:bg-rose/25 hover:text-ink active:translate-y-[1px]"
             >
               ×
             </button>
@@ -80,7 +80,7 @@ export default function ArtworkModal({
                 type="button"
                 onClick={goPrev}
                 aria-label="Previous piece"
-                className="absolute left-2 sm:-left-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border-brutal bg-cream text-ink transition-colors duration-300 hover:bg-gold active:translate-y-[1px]"
+                className="absolute left-2 sm:-left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border-hairline bg-cream text-sm text-ink/70 shadow-soft transition-colors duration-300 hover:bg-gold/40 hover:text-ink active:translate-y-[1px]"
               >
                 ←
               </button>
@@ -90,14 +90,14 @@ export default function ArtworkModal({
                 transition={{ duration: 0.45, ease: EASE }}
                 src={artwork.src}
                 alt={artwork.title}
-                className="max-h-[50vh] md:max-h-[80vh] w-auto max-w-full border-brutal bg-cream object-contain shadow-brutal-lg"
+                className="max-h-[50vh] md:max-h-[80vh] w-auto max-w-full border-hairline bg-cream object-contain shadow-soft-lg"
               />
 
               <button
                 type="button"
                 onClick={goNext}
                 aria-label="Next piece"
-                className="absolute right-2 sm:-right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border-brutal bg-cream text-ink transition-colors duration-300 hover:bg-gold active:translate-y-[1px]"
+                className="absolute right-2 sm:-right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border-hairline bg-cream text-sm text-ink/70 shadow-soft transition-colors duration-300 hover:bg-gold/40 hover:text-ink active:translate-y-[1px]"
               >
                 →
               </button>
@@ -110,35 +110,35 @@ export default function ArtworkModal({
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 16, opacity: 0 }}
                 transition={{ duration: 0.35, ease: EASE, delay: 0.08 }}
-                className="flex w-full md:w-80 flex-shrink-0 flex-col gap-4 border-brutal bg-cream p-6 shadow-brutal md:ml-8"
+                className="flex w-full md:w-80 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft md:ml-8"
               >
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-ink/40">
+                  <p className="label text-ink/35">
                     {activeIndex + 1} / {artworks.length}
                   </p>
-                  <h2 className="mt-1 font-display text-2xl leading-tight">
+                  <h2 className="mt-2 font-display text-xl leading-snug">
                     {artwork.title}
                   </h2>
                 </div>
-                <div className="text-sm uppercase tracking-wide text-ink/60">
+                <div className="label text-ink/45">
                   {artwork.year} &middot; {artwork.medium}
                 </div>
-                <div className="text-sm text-ink/60">{artwork.dimensions}</div>
-                <p className="text-sm leading-relaxed text-ink/80">
+                <div className="text-xs text-ink/45">{artwork.dimensions}</div>
+                <p className="text-[13px] leading-relaxed text-ink/65">
                   {artwork.description}
                 </p>
-                <div className="mt-auto flex gap-3 pt-2">
+                <div className="mt-auto flex gap-6 border-t border-rule pt-4">
                   <button
                     type="button"
                     onClick={goPrev}
-                    className="flex-1 border-brutal bg-cream px-4 py-2 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:bg-blue active:translate-y-[1px]"
+                    className="label text-ink/50 transition-colors duration-300 hover:text-ink"
                   >
                     Prev
                   </button>
                   <button
                     type="button"
                     onClick={goNext}
-                    className="flex-1 border-brutal bg-cream px-4 py-2 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:bg-blue active:translate-y-[1px]"
+                    className="label text-ink/50 transition-colors duration-300 hover:text-ink"
                   >
                     Next
                   </button>

@@ -17,6 +17,9 @@ const GOLD = "#F4DD90";
 const ROSE = "#C76B84";
 const PALETTE = [CREAM, BLUE, GOLD, ROSE];
 
+// Outlines sit well below full ink so the shapes read as drawn, not stamped.
+const STROKE = `stroke="${INK}" stroke-opacity="0.5"`;
+
 // Small deterministic PRNG so re-running produces identical output.
 function mulberry32(seed) {
   let a = seed;
@@ -44,7 +47,7 @@ function shapeRect(rng, w, h) {
     1
   )}" height="${rh.toFixed(
     1
-  )}" fill="${fill}" stroke="${INK}" stroke-width="6" transform="rotate(${rotate.toFixed(
+  )}" fill="${fill}" ${STROKE} stroke-width="2.5" transform="rotate(${rotate.toFixed(
     1
   )} ${(x + rw / 2).toFixed(1)} ${(y + rh / 2).toFixed(1)})" />`;
 }
@@ -54,9 +57,9 @@ function shapeCircle(rng, w, h) {
   const cx = rng() * w;
   const cy = rng() * h;
   const fill = pick(rng, PALETTE);
-  return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(
+  return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1  )}" r="${r.toFixed(
     1
-  )}" fill="${fill}" stroke="${INK}" stroke-width="6" />`;
+  )}" fill="${fill}" ${STROKE} stroke-width="2.5" />`;
 }
 
 function shapeLine(rng, w, h) {
@@ -66,7 +69,7 @@ function shapeLine(rng, w, h) {
   const y2 = rng() * h;
   return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(
     1
-  )}" y2="${y2.toFixed(1)}" stroke="${INK}" stroke-width="5" stroke-linecap="round" />`;
+  )}" y2="${y2.toFixed(1)}" ${STROKE} stroke-width="2" stroke-linecap="round" />`;
 }
 
 function shapeTriangle(rng, w, h) {
@@ -82,7 +85,7 @@ function shapeTriangle(rng, w, h) {
   ]
     .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
     .join(" ");
-  return `<polygon points="${pts}" fill="${fill}" stroke="${INK}" stroke-width="6" transform="rotate(${rotate.toFixed(
+  return `<polygon points="${pts}" fill="${fill}" ${STROKE} stroke-width="2.5" transform="rotate(${rotate.toFixed(
     1
   )} ${cx.toFixed(1)} ${cy.toFixed(1)})" />`;
 }
@@ -100,7 +103,6 @@ function generateArtworkSvg(seed, w, h, background) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   <rect width="${w}" height="${h}" fill="${background}" />
   ${shapes.join("\n  ")}
-  <rect x="4" y="4" width="${w - 8}" height="${h - 8}" fill="none" stroke="${INK}" stroke-width="8" />
 </svg>
 `;
 }
@@ -109,13 +111,13 @@ function generatePortraitSvg(seed, w, h) {
   const rng = mulberry32(seed);
   const background = pick(rng, [CREAM, BLUE, GOLD]);
   const shapes = [];
-  // Simple abstracted head-and-shoulders silhouette built from brutalist shapes.
+  // Simple abstracted head-and-shoulders silhouette.
   const cx = w / 2;
   shapes.push(
-    `<circle cx="${cx}" cy="${h * 0.34}" r="${w * 0.16}" fill="${INK}" />`
+    `<circle cx="${cx}" cy="${h * 0.34}" r="${w * 0.16}" fill="${INK}" fill-opacity="0.72" />`
   );
   shapes.push(
-    `<path d="M ${cx - w * 0.28} ${h * 0.95} Q ${cx - w * 0.3} ${h * 0.55} ${cx} ${h * 0.5} Q ${cx + w * 0.3} ${h * 0.55} ${cx + w * 0.28} ${h * 0.95} Z" fill="${INK}" />`
+    `<path d="M ${cx - w * 0.28} ${h * 0.95} Q ${cx - w * 0.3} ${h * 0.55} ${cx} ${h * 0.5} Q ${cx + w * 0.3} ${h * 0.55} ${cx + w * 0.28} ${h * 0.95} Z" fill="${INK}" fill-opacity="0.72" />`
   );
   for (let i = 0; i < 3; i++) {
     shapes.push(shapeRect(rng, w, h * 0.3));
@@ -123,7 +125,6 @@ function generatePortraitSvg(seed, w, h) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   <rect width="${w}" height="${h}" fill="${background}" />
   ${shapes.join("\n  ")}
-  <rect x="4" y="4" width="${w - 8}" height="${h - 8}" fill="none" stroke="${INK}" stroke-width="8" />
 </svg>
 `;
 }

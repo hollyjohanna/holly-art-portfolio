@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="750" height="750" viewBox="0 0 750 750">
   <rect width="750" height="750" fill="#C76B84" />
-  <line x1="595.6" y1="218.6" x2="273.2" y2="232.0" stroke="#0E1104" stroke-width="5" stroke-linecap="round" />
-  <line x1="81.0" y1="164.3" x2="360.7" y2="132.3" stroke="#0E1104" stroke-width="5" stroke-linecap="round" />
-  <polygon points="500.9,470.5 632.1,696.7 369.7,696.7" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" transform="rotate(26.6 500.9 621.3)" />
-  <circle cx="129.3" cy="269.7" r="194.6" fill="#F4DD90" stroke="#0E1104" stroke-width="6" />
-  <rect x="53.4" y="219.1" width="479.7" height="417.8" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" transform="rotate(7.3 293.2 428.1)" />
-  <circle cx="255.1" cy="106.3" r="234.2" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" />
-  <rect x="70.8" y="214.8" width="418.1" height="390.6" fill="#93B5C6" stroke="#0E1104" stroke-width="6" transform="rotate(-8.0 279.8 410.1)" />
-  <rect x="4" y="4" width="742" height="742" fill="none" stroke="#0E1104" stroke-width="8" />
+  <line x1="595.6" y1="218.6" x2="273.2" y2="232.0" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round" />
+  <line x1="81.0" y1="164.3" x2="360.7" y2="132.3" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round" />
+  <polygon points="500.9,470.5 632.1,696.7 369.7,696.7" fill="#FFF8E7" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(26.6 500.9 621.3)" />
+  <circle cx="129.3" cy="269.7" r="194.6" fill="#F4DD90" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" />
+  <rect x="53.4" y="219.1" width="479.7" height="417.8" fill="#FFF8E7" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(7.3 293.2 428.1)" />
+  <circle cx="255.1" cy="106.3" r="234.2" fill="#FFF8E7" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" />
+  <rect x="70.8" y="214.8" width="418.1" height="390.6" fill="#93B5C6" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(-8.0 279.8 410.1)" />
 </svg>

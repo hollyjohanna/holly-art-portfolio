@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Inter } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const archivoBlack = Archivo_Black({
-  variable: "--font-archivo-black",
-  weight: "400",
+const archivo = Archivo({
+  variable: "--font-archivo",
+  weight: ["500", "600"],
   subsets: ["latin"],
 });
 
@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivoBlack.variable} ${inter.variable} h-full antialiased`}
+      className={`${archivo.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <Nav />

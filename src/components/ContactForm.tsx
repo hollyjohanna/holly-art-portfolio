@@ -63,10 +63,10 @@ export default function ContactForm() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: EASE }}
-        className="border-brutal bg-gold/60 p-8 text-center"
+        className="border-hairline bg-gold/25 p-8 text-center"
       >
-        <p className="font-display text-xl">Message sent</p>
-        <p className="mt-2 text-sm text-ink/70">
+        <p className="font-display text-lg">Message sent</p>
+        <p className="mt-2 text-[13px] leading-relaxed text-ink/60">
           Thanks for reaching out — I&apos;ll get back to you soon.
         </p>
         <button
@@ -75,7 +75,7 @@ export default function ContactForm() {
             startedAt.current = Date.now();
             setStatus("idle");
           }}
-          className="mt-6 border-brutal bg-cream px-5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:bg-blue active:translate-y-[1px]"
+          className="mt-6 border-hairline-strong bg-transparent px-5 py-2.5 label text-ink/70 transition-colors duration-300 hover:bg-cream hover:text-ink active:translate-y-[1px]"
         >
           Send another message
         </button>
@@ -84,7 +84,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {/* Hidden from people, but automated form-fillers will complete it. */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label>
@@ -93,45 +93,39 @@ export default function ContactForm() {
         </label>
       </div>
 
-      <label className="flex flex-col gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wide text-ink/60">
-          Name
-        </span>
+      <label className="flex flex-col gap-2.5">
+        <span className="label text-ink/45">Name</span>
         <input
           type="text"
           name="name"
           autoComplete="name"
           maxLength={MAX_NAME_LENGTH}
-          className="border-brutal bg-cream px-4 py-3 text-base outline-none transition-colors duration-300 focus:bg-blue/20"
+          className="border-hairline bg-cream px-4 py-3 text-sm outline-none transition-colors duration-300 placeholder:text-ink/25 focus:border-ink/35 focus:bg-blue/10"
           placeholder="Your name"
         />
       </label>
 
-      <label className="flex flex-col gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wide text-ink/60">
-          Email
-        </span>
+      <label className="flex flex-col gap-2.5">
+        <span className="label text-ink/45">Email</span>
         <input
           type="email"
           name="email"
           required
           autoComplete="email"
           maxLength={MAX_EMAIL_LENGTH}
-          className="border-brutal bg-cream px-4 py-3 text-base outline-none transition-colors duration-300 focus:bg-blue/20"
+          className="border-hairline bg-cream px-4 py-3 text-sm outline-none transition-colors duration-300 placeholder:text-ink/25 focus:border-ink/35 focus:bg-blue/10"
           placeholder="you@example.com"
         />
       </label>
 
-      <label className="flex flex-col gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wide text-ink/60">
-          Message
-        </span>
+      <label className="flex flex-col gap-2.5">
+        <span className="label text-ink/45">Message</span>
         <textarea
           name="message"
           required
           rows={5}
           maxLength={MAX_MESSAGE_LENGTH}
-          className="border-brutal bg-cream px-4 py-3 text-base outline-none transition-colors duration-300 focus:bg-blue/20 resize-none"
+          className="border-hairline bg-cream px-4 py-3 text-sm leading-relaxed outline-none transition-colors duration-300 placeholder:text-ink/25 focus:border-ink/35 focus:bg-blue/10 resize-none"
           placeholder="Say hello, ask about a piece, or enquire about a commission."
         />
       </label>
@@ -142,7 +136,7 @@ export default function ContactForm() {
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            className="text-sm font-medium text-rose"
+            className="text-[13px] text-rose"
           >
             {errorMessage}
           </motion.p>
@@ -152,8 +146,8 @@ export default function ContactForm() {
       <motion.button
         type="submit"
         disabled={status === "submitting"}
-        whileTap={{ scale: 0.97 }}
-        className="mt-2 self-start border-brutal bg-ink px-6 py-3 text-sm font-semibold uppercase tracking-wide text-cream shadow-brutal-sm transition-colors duration-300 hover:bg-rose disabled:opacity-60"
+        whileTap={{ scale: 0.98 }}
+        className="mt-2 self-start border-hairline-strong bg-transparent px-7 py-3 label text-ink/80 transition-colors duration-300 hover:bg-ink hover:text-cream disabled:opacity-50"
       >
         {status === "submitting" ? "Sending…" : "Send message"}
       </motion.button>

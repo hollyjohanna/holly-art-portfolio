@@ -1,12 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
   <rect width="900" height="900" fill="#F4DD90" />
-  <circle cx="552.3" cy="883.0" r="238.5" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" />
-  <line x1="486.5" y1="881.9" x2="502.5" y2="842.1" stroke="#0E1104" stroke-width="5" stroke-linecap="round" />
-  <rect x="344.5" y="300.2" width="524.5" height="298.2" fill="#C76B84" stroke="#0E1104" stroke-width="6" transform="rotate(-7.5 606.8 449.3)" />
-  <circle cx="336.6" cy="816.5" r="147.8" fill="#93B5C6" stroke="#0E1104" stroke-width="6" />
-  <rect x="11.7" y="128.2" width="236.5" height="261.2" fill="#FFF8E7" stroke="#0E1104" stroke-width="6" transform="rotate(-3.8 129.9 258.8)" />
-  <line x1="608.0" y1="193.5" x2="395.7" y2="821.3" stroke="#0E1104" stroke-width="5" stroke-linecap="round" />
-  <circle cx="90.3" cy="114.2" r="112.9" fill="#C76B84" stroke="#0E1104" stroke-width="6" />
-  <line x1="376.1" y1="566.4" x2="116.9" y2="180.1" stroke="#0E1104" stroke-width="5" stroke-linecap="round" />
-  <rect x="4" y="4" width="892" height="892" fill="none" stroke="#0E1104" stroke-width="8" />
+  <circle cx="552.3" cy="883.0" r="238.5" fill="#FFF8E7" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" />
+  <line x1="486.5" y1="881.9" x2="502.5" y2="842.1" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round" />
+  <rect x="344.5" y="300.2" width="524.5" height="298.2" fill="#C76B84" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(-7.5 606.8 449.3)" />
+  <circle cx="336.6" cy="816.5" r="147.8" fill="#93B5C6" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" />
+  <rect x="11.7" y="128.2" width="236.5" height="261.2" fill="#FFF8E7" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" transform="rotate(-3.8 129.9 258.8)" />
+  <line x1="608.0" y1="193.5" x2="395.7" y2="821.3" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round" />
+  <circle cx="90.3" cy="114.2" r="112.9" fill="#C76B84" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2.5" />
+  <line x1="376.1" y1="566.4" x2="116.9" y2="180.1" stroke="#0E1104" stroke-opacity="0.5" stroke-width="2" stroke-linecap="round" />
 </svg>

@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="px-4 sm:px-8 py-8 sm:py-12">
+    <div className="px-6 sm:px-10 py-10 sm:py-16">
       <Reveal>
-        <h1 className="font-display text-3xl sm:text-4xl">Contact</h1>
-        <p className="mt-2 max-w-lg text-sm sm:text-base text-ink/60">
+        <h1 className="font-display text-2xl sm:text-3xl">Contact</h1>
+        <p className="mt-3 max-w-sm text-[13px] leading-relaxed text-ink/50">
           Questions about a piece, commissions, or just want to say hello —
           drop a message below.
         </p>
       </Reveal>
 
-      <Reveal delay={0.1} className="mt-8 max-w-xl">
+      <Reveal delay={0.1} className="mt-10 max-w-lg">
         <ContactForm />
       </Reveal>
     </div>

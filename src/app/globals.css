@@ -9,6 +9,9 @@
 
   --background: var(--color-cream);
   --foreground: var(--color-ink);
+
+  --rule: color-mix(in oklab, var(--color-ink) 14%, transparent);
+  --rule-strong: color-mix(in oklab, var(--color-ink) 28%, transparent);
 }
 
 @theme inline {
@@ -17,9 +20,10 @@
   --color-blue: var(--color-blue);
   --color-gold: var(--color-gold);
   --color-rose: var(--color-rose);
+  --color-rule: var(--rule);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-display: var(--font-archivo-black);
+  --font-display: var(--font-archivo);
   --font-sans: var(--font-inter);
 }
 
@@ -27,30 +31,49 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--color-ink);
-  color: var(--color-cream);
+  background: var(--color-gold);
+  color: var(--color-ink);
 }
 
-/* Neo-brutalist utilities: hard, un-blurred offset shadows and thick borders */
 @layer utilities {
-  .border-brutal {
-    border-width: 3px;
+  .font-display {
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* Small caps-style label used for nav, captions, buttons and form labels */
+  .label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  .border-hairline {
+    border-width: 1px;
     border-style: solid;
-    border-color: var(--color-ink);
+    border-color: var(--rule);
   }
 
-  .shadow-brutal {
-    box-shadow: 8px 8px 0 0 var(--color-ink);
+  .border-hairline-strong {
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--rule-strong);
   }
 
-  .shadow-brutal-sm {
-    box-shadow: 4px 4px 0 0 var(--color-ink);
+  .shadow-soft {
+    box-shadow:
+      0 1px 2px color-mix(in oklab, var(--color-ink) 5%, transparent),
+      0 10px 28px color-mix(in oklab, var(--color-ink) 7%, transparent);
   }
 
-  .shadow-brutal-lg {
-    box-shadow: 12px 12px 0 0 var(--color-ink);
+  .shadow-soft-lg {
+    box-shadow:
+      0 2px 6px color-mix(in oklab, var(--color-ink) 6%, transparent),
+      0 28px 64px color-mix(in oklab, var(--color-ink) 14%, transparent);
   }
 }
