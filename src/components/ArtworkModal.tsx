@@ -7,6 +7,18 @@ import type { Artwork } from "@/lib/artworks";
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CONTROLS_HIDE_MS = 5000;
 
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction >= 0 ? "100%" : "-100%",
+  }),
+  center: {
+    x: 0,
+  },
+  exit: (direction: number) => ({
+    x: direction >= 0 ? "-100%" : "100%",
+  }),
+};
+
 export default function ArtworkModal({
   artworks,
   activeId,
@@ -21,11 +33,13 @@ export default function ArtworkModal({
   const activeIndex = artworks.findIndex((a) => a.id === activeId);
   const artwork = activeIndex >= 0 ? artworks[activeIndex] : null;
   const [imageIndex, setImageIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState(0);
   const [controlsVisible, setControlsVisible] = useState(true);
   const hideTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     setImageIndex(0);
+    setSlideDirection(0);
   }, [activeId]);
 
   const goPrevArtwork = useCallback(() => {
@@ -42,13 +56,24 @@ export default function ArtworkModal({
 
   const goPrevImage = useCallback(() => {
     if (!artwork || artwork.images.length < 2) return;
+    setSlideDirection(-1);
     setImageIndex((i) => (i - 1 + artwork.images.length) % artwork.images.length);
   }, [artwork]);
 
   const goNextImage = useCallback(() => {
     if (!artwork || artwork.images.length < 2) return;
+    setSlideDirection(1);
     setImageIndex((i) => (i + 1) % artwork.images.length);
   }, [artwork]);
+
+  const goToImage = useCallback(
+    (nextIndex: number) => {
+      if (!artwork || nextIndex === imageIndex) return;
+      setSlideDirection(nextIndex > imageIndex ? 1 : -1);
+      setImageIndex(nextIndex);
+    },
+    [artwork, imageIndex]
+  );
 
   useEffect(() => {
     if (!artwork) return;
@@ -130,21 +155,32 @@ export default function ArtworkModal({
             </button>
 
             <div
-              className="relative min-w-0 self-center md:self-stretch"
+              key={artwork.id}
+              className="relative min-w-0 self-center overflow-hidden border-hairline bg-cream shadow-soft-lg md:self-stretch"
               onMouseMove={revealControls}
               onMouseEnter={revealControls}
             >
-              <AnimatePresence mode="wait">
+              {/* Invisible sizer keeps the frame stable while slides crossfade/slide. */}
+              <img
+                src={currentImage.src}
+                alt=""
+                aria-hidden
+                className="pointer-events-none block max-h-[50vh] w-auto max-w-full opacity-0 md:max-h-[85vh]"
+              />
+
+              <AnimatePresence initial={false} custom={slideDirection}>
                 <motion.img
                   key={`${artwork.id}-${safeIndex}`}
                   layoutId={safeIndex === 0 ? `art-image-${artwork.id}` : undefined}
-                  initial={safeIndex === 0 ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35, ease: EASE }}
+                  custom={slideDirection}
+                  variants={slideVariants}
+                  initial={slideDirection === 0 ? false : "enter"}
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: EASE }}
                   src={currentImage.src}
                   alt={`${artwork.title}${hasMultiple ? ` — photo ${safeIndex + 1}` : ""}`}
-                  className="block max-h-[50vh] md:max-h-[85vh] w-auto max-w-full border-hairline bg-cream object-contain shadow-soft-lg"
+                  className="absolute inset-0 h-full w-full object-contain"
                 />
               </AnimatePresence>
 
@@ -153,7 +189,7 @@ export default function ArtworkModal({
                   initial={false}
                   animate={{ opacity: controlsVisible ? 1 : 0 }}
                   transition={{ duration: 0.45, ease: EASE }}
-                  className="absolute inset-0"
+                  className="absolute inset-0 z-10"
                   style={{ pointerEvents: controlsVisible ? "auto" : "none" }}
                 >
                   <button
@@ -189,7 +225,7 @@ export default function ArtworkModal({
                           aria-selected={i === safeIndex}
                           aria-label={`Photo ${i + 1} of ${images.length}`}
                           tabIndex={controlsVisible ? 0 : -1}
-                          onClick={() => setImageIndex(i)}
+                          onClick={() => goToImage(i)}
                           className={`h-1.5 rounded-full transition-all duration-300 ${
                             i === safeIndex
                               ? "w-5 bg-cream"
