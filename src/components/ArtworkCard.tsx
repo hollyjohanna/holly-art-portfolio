@@ -10,6 +10,9 @@ export default function ArtworkCard({
   artwork: Artwork;
   onOpen: () => void;
 }) {
+  const cover = artwork.images[0];
+  if (!cover) return null;
+
   return (
     <div className="mb-5 sm:mb-7 break-inside-avoid">
       <motion.button
@@ -20,17 +23,17 @@ export default function ArtworkCard({
       >
         <motion.img
           layoutId={`art-image-${artwork.id}`}
-          src={artwork.src}
+          src={cover.src}
           alt={artwork.title}
-          width={artwork.width}
-          height={artwork.height}
+          width={cover.width}
+          height={cover.height}
           className="block w-full h-auto"
         />
         <div className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/30" />
         <div className="pointer-events-none absolute inset-0 flex flex-col justify-end gap-0.5 p-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
           <span className="label text-cream/90">{artwork.medium}</span>
           <span className="label text-cream/60">
-            {artwork.year} &middot; {artwork.dimensions}
+            {artwork.year || "[Year]"} &middot; {artwork.dimensions}
           </span>
         </div>
       </motion.button>
