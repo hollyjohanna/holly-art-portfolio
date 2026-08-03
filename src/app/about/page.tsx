@@ -7,9 +7,22 @@ export const metadata: Metadata = {
 };
 
 const photos = [
-  { src: "/about/photo-01.svg", rotate: "-rotate-1", className: "w-3/5 sm:w-2/5" },
-  { src: "/about/photo-02.svg", rotate: "rotate-1", className: "w-1/2 sm:w-2/5 self-end" },
-  { src: "/about/photo-03.svg", rotate: "-rotate-[0.5deg]", className: "w-2/5 sm:w-1/3" },
+  {
+    src: "/about/photo-01.jpg",
+    alt: "Holly Johanna, studio portrait",
+  },
+  {
+    src: "/about/photo-02.jpg",
+    alt: "Holly Johanna outside, leather jacket",
+  },
+  {
+    src: "/about/photo-03.jpg",
+    alt: "Holly Johanna at a cafe table",
+  },
+  {
+    src: "/about/photo-04.jpg",
+    alt: "Holly Johanna by the waterfront",
+  },
 ];
 
 export default function AboutPage() {
@@ -21,13 +34,13 @@ export default function AboutPage() {
 
       <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start">
         <Reveal delay={0.05}>
-          <div className="flex flex-wrap gap-5 sm:gap-7 items-start">
-            {photos.map((photo, i) => (
+          <div className="grid grid-cols-2 gap-4 sm:gap-5">
+            {photos.map((photo) => (
               <img
                 key={photo.src}
                 src={photo.src}
-                alt={`Holly Johanna ${i + 1}`}
-                className={`${photo.className} ${photo.rotate} border-hairline shadow-soft bg-cream object-cover transition-transform duration-500 hover:rotate-0`}
+                alt={photo.alt}
+                className="aspect-[3/4] w-full border-hairline bg-cream object-cover shadow-soft transition-transform duration-500 ease-out hover:scale-[1.03]"
               />
             ))}
           </div>

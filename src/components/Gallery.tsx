@@ -18,7 +18,7 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
           hidden: {},
           visible: { transition: { staggerChildren: 0.05 } },
         }}
-        className="columns-1 sm:columns-2 xl:columns-3 2xl:columns-4 gap-5 sm:gap-7"
+        className="columns-1 sm:columns-2 xl:columns-3 gap-5 sm:gap-7"
       >
         {artworks.map((artwork) => (
           <motion.div
