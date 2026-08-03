@@ -50,11 +50,9 @@ function that sends mail via Resend. You need:
 3. On Vercel: add the same variable under Project → Settings →
    Environment Variables.
 
-Until a sending domain is verified in Resend, emails must be sent from
-Resend's shared address (`onboarding@resend.dev`) — this is already the
-default `CONTACT_FROM_EMAIL`. Once a domain (e.g. `art.hollyjohanna.com`) is
-verified in Resend, update `CONTACT_FROM_EMAIL` to send from a real address
-on that domain.
+`hollyjohanna.com` is verified as a sending domain in Resend, so
+`CONTACT_FROM_EMAIL` can be any address on it — `hello@hollyjohanna.com` by
+default. These are send-only addresses and need no mailbox behind them.
 
 `CONTACT_TO_EMAIL` controls where messages are delivered (defaults to
 `hollyjohanna.robbins@gmail.com`).

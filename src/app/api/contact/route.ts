@@ -3,7 +3,7 @@ import { Resend } from "resend";
 
 const TO_EMAIL = process.env.CONTACT_TO_EMAIL || "hollyjohanna.robbins@gmail.com";
 const FROM_EMAIL =
-  process.env.CONTACT_FROM_EMAIL || "Holly Johanna Art <onboarding@resend.dev>";
+  process.env.CONTACT_FROM_EMAIL || "Holly Johanna Art <hello@hollyjohanna.com>";
 
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 200;
