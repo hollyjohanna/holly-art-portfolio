@@ -1,15 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 200;
+const MAX_MESSAGE_LENGTH = 5000;
+
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const startedAt = useRef(0);
+
+  useEffect(() => {
+    startedAt.current = Date.now();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,6 +31,8 @@ export default function ContactForm() {
       name: String(data.get("name") || ""),
       email: String(data.get("email") || ""),
       message: String(data.get("message") || ""),
+      website: String(data.get("website") || ""),
+      startedAt: startedAt.current || undefined,
     };
 
     try {
@@ -60,7 +71,10 @@ export default function ContactForm() {
         </p>
         <button
           type="button"
-          onClick={() => setStatus("idle")}
+          onClick={() => {
+            startedAt.current = Date.now();
+            setStatus("idle");
+          }}
           className="mt-6 border-brutal bg-cream px-5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors duration-300 hover:bg-blue active:translate-y-[1px]"
         >
           Send another message
@@ -71,6 +85,14 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      {/* Hidden from people, but automated form-fillers will complete it. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label>
+          Website
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
+
       <label className="flex flex-col gap-2">
         <span className="text-xs font-semibold uppercase tracking-wide text-ink/60">
           Name
@@ -79,6 +101,7 @@ export default function ContactForm() {
           type="text"
           name="name"
           autoComplete="name"
+          maxLength={MAX_NAME_LENGTH}
           className="border-brutal bg-cream px-4 py-3 text-base outline-none transition-colors duration-300 focus:bg-blue/20"
           placeholder="Your name"
         />
@@ -93,6 +116,7 @@ export default function ContactForm() {
           name="email"
           required
           autoComplete="email"
+          maxLength={MAX_EMAIL_LENGTH}
           className="border-brutal bg-cream px-4 py-3 text-base outline-none transition-colors duration-300 focus:bg-blue/20"
           placeholder="you@example.com"
         />
@@ -106,6 +130,7 @@ export default function ContactForm() {
           name="message"
           required
           rows={5}
+          maxLength={MAX_MESSAGE_LENGTH}
           className="border-brutal bg-cream px-4 py-3 text-base outline-none transition-colors duration-300 focus:bg-blue/20 resize-none"
           placeholder="Say hello, ask about a piece, or enquire about a commission."
         />

@@ -5,8 +5,73 @@ const TO_EMAIL = process.env.CONTACT_TO_EMAIL || "hollyjohanna.robbins@gmail.com
 const FROM_EMAIL =
   process.env.CONTACT_FROM_EMAIL || "Holly Johanna Art <onboarding@resend.dev>";
 
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 200;
+const MAX_MESSAGE_LENGTH = 5000;
+
+// A genuine visitor takes at least a few seconds to fill the form in.
+const MIN_FILL_MS = 3000;
+const MAX_FORM_AGE_MS = 24 * 60 * 60 * 1000;
+
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const MAX_SUBMISSIONS_PER_WINDOW = 3;
+
+// Per-instance only: serverless means several instances may run at once, so
+// this throttles bursts rather than enforcing a strict global quota.
+const recentSubmissions = new Map<string, number[]>();
+
+function pruneExpired(now: number) {
+  for (const [key, timestamps] of recentSubmissions) {
+    const fresh = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+    if (fresh.length === 0) {
+      recentSubmissions.delete(key);
+    } else {
+      recentSubmissions.set(key, fresh);
+    }
+  }
+}
+
+function isRateLimited(ip: string) {
+  const now = Date.now();
+
+  if (recentSubmissions.size > 1000) {
+    pruneExpired(now);
+  }
+
+  const fresh = (recentSubmissions.get(ip) ?? []).filter(
+    (t) => now - t < RATE_LIMIT_WINDOW_MS
+  );
+
+  if (fresh.length >= MAX_SUBMISSIONS_PER_WINDOW) {
+    recentSubmissions.set(ip, fresh);
+    return true;
+  }
+
+  fresh.push(now);
+  recentSubmissions.set(ip, fresh);
+  return false;
+}
+
+function getClientIp(request: Request) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  return request.headers.get("x-real-ip") || "unknown";
+}
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 export async function POST(request: Request) {
-  let body: { name?: string; email?: string; message?: string };
+  let body: {
+    name?: string;
+    email?: string;
+    message?: string;
+    website?: string;
+    startedAt?: number;
+  };
 
   try {
     body = await request.json();
@@ -14,12 +79,56 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const { name, email, message } = body;
+  // Honeypot and timing traps report success so bots don't learn to adapt.
+  if (typeof body.website === "string" && body.website.trim() !== "") {
+    return NextResponse.json({ ok: true });
+  }
+
+  if (typeof body.startedAt === "number") {
+    const elapsed = Date.now() - body.startedAt;
+    if (elapsed < MIN_FILL_MS || elapsed > MAX_FORM_AGE_MS) {
+      return NextResponse.json({ ok: true });
+    }
+  }
+
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const email = typeof body.email === "string" ? body.email.trim() : "";
+  const message = typeof body.message === "string" ? body.message.trim() : "";
 
   if (!email || !message) {
     return NextResponse.json(
       { error: "Email and message are required." },
       { status: 400 }
+    );
+  }
+
+  if (!isValidEmail(email) || email.length > MAX_EMAIL_LENGTH) {
+    return NextResponse.json(
+      { error: "Please enter a valid email address." },
+      { status: 400 }
+    );
+  }
+
+  if (name.length > MAX_NAME_LENGTH) {
+    return NextResponse.json(
+      { error: `Please keep your name under ${MAX_NAME_LENGTH} characters.` },
+      { status: 400 }
+    );
+  }
+
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    return NextResponse.json(
+      {
+        error: `Please keep your message under ${MAX_MESSAGE_LENGTH} characters.`,
+      },
+      { status: 400 }
+    );
+  }
+
+  if (isRateLimited(getClientIp(request))) {
+    return NextResponse.json(
+      { error: "Too many messages sent. Please try again in a few minutes." },
+      { status: 429 }
     );
   }
 
@@ -40,8 +149,8 @@ export async function POST(request: Request) {
       from: FROM_EMAIL,
       to: TO_EMAIL,
       replyTo: email,
-      subject: `New message from ${name?.trim() || "the portfolio site"}`,
-      text: `From: ${name?.trim() || "Anonymous"} <${email}>\n\n${message}`,
+      subject: `New message from ${name || "the portfolio site"}`,
+      text: `From: ${name || "Anonymous"} <${email}>\n\n${message}`,
     });
 
     if (error) {
