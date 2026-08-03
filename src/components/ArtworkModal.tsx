@@ -64,7 +64,7 @@ export default function ArtworkModal({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative flex w-full max-w-6xl max-h-[92vh] flex-col md:flex-row items-stretch gap-4 md:gap-0"
+            className="relative flex w-full md:w-auto max-w-6xl max-h-[92vh] flex-col md:flex-row items-center md:items-stretch gap-4 md:gap-0"
           >
             <button
               type="button"
@@ -75,16 +75,7 @@ export default function ArtworkModal({
               ×
             </button>
 
-            <div className="relative flex flex-1 items-center justify-center min-h-0 min-w-0">
-              <button
-                type="button"
-                onClick={goPrev}
-                aria-label="Previous piece"
-                className="absolute left-2 sm:-left-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border-hairline bg-cream text-sm text-ink/70 shadow-soft transition-colors duration-300 hover:bg-gold/40 hover:text-ink active:translate-y-[1px]"
-              >
-                ←
-              </button>
-
+            <div className="flex min-h-0 min-w-0 items-center justify-center">
               <motion.img
                 layoutId={`art-image-${artwork.id}`}
                 transition={{ duration: 0.45, ease: EASE }}
@@ -92,15 +83,6 @@ export default function ArtworkModal({
                 alt={artwork.title}
                 className="max-h-[50vh] md:max-h-[80vh] w-auto max-w-full border-hairline bg-cream object-contain shadow-soft-lg"
               />
-
-              <button
-                type="button"
-                onClick={goNext}
-                aria-label="Next piece"
-                className="absolute right-2 sm:-right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border-hairline bg-cream text-sm text-ink/70 shadow-soft transition-colors duration-300 hover:bg-gold/40 hover:text-ink active:translate-y-[1px]"
-              >
-                →
-              </button>
             </div>
 
             <AnimatePresence mode="wait">
@@ -110,7 +92,7 @@ export default function ArtworkModal({
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: 16, opacity: 0 }}
                 transition={{ duration: 0.35, ease: EASE, delay: 0.08 }}
-                className="flex w-full md:w-80 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft md:ml-8"
+                className="flex w-full md:-ml-px md:w-80 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg"
               >
                 <div>
                   <p className="label text-ink/35">

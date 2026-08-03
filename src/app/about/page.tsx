@@ -14,7 +14,7 @@ const photos = [
 
 export default function AboutPage() {
   return (
-    <div className="px-6 sm:px-10 py-10 sm:py-16">
+    <div className="container-page py-10 sm:py-16">
       <Reveal>
         <h1 className="font-display text-2xl sm:text-3xl">About</h1>
       </Reveal>

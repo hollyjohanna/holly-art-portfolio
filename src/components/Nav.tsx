@@ -17,7 +17,7 @@ export default function Nav() {
 
   return (
     <header className="sticky top-0 z-50 bg-cream/90 backdrop-blur-sm border-b border-rule">
-      <div className="flex items-center justify-between px-6 sm:px-10 py-4">
+      <div className="container-page flex items-center justify-between py-4">
         <Link
           href="/"
           onClick={() => setMenuOpen(false)}
@@ -26,7 +26,7 @@ export default function Nav() {
           Holly Johanna
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-1">
+        <nav className="hidden sm:flex items-center gap-1 lg:-mr-4">
           {LINKS.map((link) => {
             const active = pathname === link.href;
             return (
