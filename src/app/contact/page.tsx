@@ -3,7 +3,7 @@ import Reveal from "@/components/Reveal";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact — Holly Johanna",
+  title: "Contact - Holly Johanna",
   description: "Get in touch about a piece, a commission, or anything else.",
 };
 

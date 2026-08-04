@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
-  title: "About — Holly Johanna",
+  title: "About - Holly Johanna",
   description: "A little about Holly Johanna and her practice.",
 };
 

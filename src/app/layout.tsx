@@ -16,12 +16,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Holly Johanna — Art Portfolio",
+  title: "Holly Johanna - Art Portfolio",
   description:
     "Paintings and works by Holly Johanna. A collection of original art, exhibitions, and commissions.",
   metadataBase: new URL("https://art.hollyjohanna.com"),
   openGraph: {
-    title: "Holly Johanna — Art Portfolio",
+    title: "Holly Johanna - Art Portfolio",
     description:
       "Paintings and works by Holly Johanna. A collection of original art, exhibitions, and commissions.",
     type: "website",
