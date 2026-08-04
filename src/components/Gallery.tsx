@@ -26,11 +26,21 @@ function easeOutQuart(t: number) {
   return 1 - Math.pow(1 - clamped, 4);
 }
 
+/** Minimum time the loading screen stays up, even if covers load instantly —
+ *  keeps it from flashing by for a frame on a fast connection. */
+const MIN_LOADING_MS = 3000;
+
+/** Module-scoped, not state — survives unmount/remount when navigating away
+ *  from and back to this page in the same session, so the splash only ever
+ *  shows once per visit instead of replaying every time you come back. */
+let hasShownLoadingScreen = false;
+
 export default function Gallery({ artworks }: { artworks: Artwork[] }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [openingId, setOpeningId] = useState<string | null>(null);
   const [loadedCovers, setLoadedCovers] = useState(0);
-  const [assetsReady, setAssetsReady] = useState(false);
+  const [assetsReady, setAssetsReady] = useState(hasShownLoadingScreen);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(hasShownLoadingScreen);
   const marked = useRef(new Set<string>());
 
   const totalCovers = artworks.filter((a) => a.images[0]).length;
@@ -48,15 +58,25 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
   }, [allSrcs]);
 
   useEffect(() => {
-    if (assetsReady) return;
+    if (hasShownLoadingScreen) return;
+    const t = window.setTimeout(() => setMinTimeElapsed(true), MIN_LOADING_MS);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (assetsReady || hasShownLoadingScreen) return;
     const t = window.setTimeout(() => setAssetsReady(true), 8000);
     return () => window.clearTimeout(t);
   }, [assetsReady]);
 
   useEffect(() => {
-    if (!coversReady || assetsReady) return;
+    if (!coversReady || !minTimeElapsed || assetsReady) return;
     setAssetsReady(true);
-  }, [coversReady, assetsReady]);
+  }, [coversReady, minTimeElapsed, assetsReady]);
+
+  useEffect(() => {
+    if (assetsReady) hasShownLoadingScreen = true;
+  }, [assetsReady]);
 
   // Keep the page from scrolling while the covers load in behind the splash
   // screen — nothing should move until everything is ready to be smooth.

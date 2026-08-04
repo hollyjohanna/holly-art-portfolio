@@ -38,7 +38,12 @@ export default function Nav() {
                 {active && (
                   <motion.span
                     layoutId="nav-active-pill"
-                    className="absolute inset-x-3 bottom-1 h-px bg-ink/45"
+                    className="absolute inset-x-3 bottom-1 h-px"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-blue))",
+                      opacity: 0.45,
+                    }}
                     transition={{ type: "spring", stiffness: 400, damping: 34 }}
                   />
                 )}
