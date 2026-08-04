@@ -106,9 +106,10 @@ body {
   }
 
   /* Gallery scroll reveal — progress is scrubbed from scroll position in JS.
-     No timed transition; speed follows how fast the user scrolls. */
+     No timed transition; speed follows how fast the user scrolls. Rise
+     distance kept in sync with RISE_REM in Gallery.tsx. */
   .gallery-reveal {
     opacity: 0;
-    transform: translate3d(0, 5.5rem, 0);
+    transform: translate3d(0, 9rem, 0);
   }
 }
