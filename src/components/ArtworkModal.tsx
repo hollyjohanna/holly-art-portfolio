@@ -211,7 +211,7 @@ export default function ArtworkModal({
                   layoutId={frameLayoutId}
                 />
 
-                <div className="flex w-full md:-ml-px md:w-80 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
+                <div className="flex w-full md:w-80 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
                   <div>
                     <p className="label text-ink/35">
                       {activeIndex + 1} / {artworks.length}
@@ -384,7 +384,7 @@ function ArtworkPhotoStage({
     <motion.div
       layoutId={layoutId}
       transition={{ duration: OPEN_MS, ease: EASE }}
-      className="relative min-w-0 self-center overflow-hidden border-hairline bg-cream shadow-soft-lg md:self-stretch"
+      className="relative min-w-0 self-center overflow-hidden bg-cream shadow-soft-lg md:self-stretch"
       onMouseMove={revealControls}
       onMouseEnter={revealControls}
     >

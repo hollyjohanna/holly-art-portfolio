@@ -16,9 +16,9 @@ export default function LoadingScreen({
   return (
     <motion.div
       key="loading-screen"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6, ease: EASE }}
+      initial={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: "-8%", scale: 1.08 }}
+      transition={{ duration: 0.7, ease: EASE }}
       className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-cream"
       aria-hidden
     >

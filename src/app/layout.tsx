@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, Inter } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import LoadingGate from "@/components/LoadingGate";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -39,9 +40,11 @@ export default function RootLayout({
       className={`${archivo.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
-        <Nav />
-        <main className="flex-1 flex flex-col">{children}</main>
-        <Footer />
+        <LoadingGate>
+          <Nav />
+          <main className="flex-1 flex flex-col">{children}</main>
+          <Footer />
+        </LoadingGate>
       </body>
     </html>
   );

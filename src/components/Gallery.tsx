@@ -1,11 +1,10 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Artwork } from "@/lib/artworks";
 import ArtworkCard from "@/components/ArtworkCard";
 import ArtworkModal from "@/components/ArtworkModal";
-import LoadingScreen from "@/components/LoadingScreen";
+import { useLoadingGate } from "@/components/LoadingGate";
 import { preloadImages } from "@/lib/preload";
 
 /** How far the card rises while scrubbing in (CSS rem) — kept in sync with
@@ -26,25 +25,12 @@ function easeOutQuart(t: number) {
   return 1 - Math.pow(1 - clamped, 4);
 }
 
-/** Minimum time the loading screen stays up, even if covers load instantly —
- *  keeps it from flashing by for a frame on a fast connection. */
-const MIN_LOADING_MS = 3000;
-
-/** Module-scoped, not state — survives unmount/remount when navigating away
- *  from and back to this page in the same session, so the splash only ever
- *  shows once per visit instead of replaying every time you come back. */
-let hasShownLoadingScreen = false;
-
 export default function Gallery({ artworks }: { artworks: Artwork[] }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [openingId, setOpeningId] = useState<string | null>(null);
-  const [loadedCovers, setLoadedCovers] = useState(0);
-  const [assetsReady, setAssetsReady] = useState(hasShownLoadingScreen);
-  const [minTimeElapsed, setMinTimeElapsed] = useState(hasShownLoadingScreen);
-  const marked = useRef(new Set<string>());
+  const { ready: assetsReady, registerTotal, reportLoaded } = useLoadingGate();
 
   const totalCovers = artworks.filter((a) => a.images[0]).length;
-  const coversReady = loadedCovers >= totalCovers && totalCovers > 0;
 
   const allSrcs = useMemo(
     () =>
@@ -57,43 +43,17 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
     void preloadImages(allSrcs);
   }, [allSrcs]);
 
+  // Tell the shared loading gate how many covers it's waiting on.
   useEffect(() => {
-    if (hasShownLoadingScreen) return;
-    const t = window.setTimeout(() => setMinTimeElapsed(true), MIN_LOADING_MS);
-    return () => window.clearTimeout(t);
-  }, []);
+    registerTotal(totalCovers);
+  }, [registerTotal, totalCovers]);
 
-  useEffect(() => {
-    if (assetsReady || hasShownLoadingScreen) return;
-    const t = window.setTimeout(() => setAssetsReady(true), 8000);
-    return () => window.clearTimeout(t);
-  }, [assetsReady]);
-
-  useEffect(() => {
-    if (!coversReady || !minTimeElapsed || assetsReady) return;
-    setAssetsReady(true);
-  }, [coversReady, minTimeElapsed, assetsReady]);
-
-  useEffect(() => {
-    if (assetsReady) hasShownLoadingScreen = true;
-  }, [assetsReady]);
-
-  // Keep the page from scrolling while the covers load in behind the splash
-  // screen — nothing should move until everything is ready to be smooth.
-  useEffect(() => {
-    if (assetsReady) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [assetsReady]);
-
-  const onCoverLoad = useCallback((id: string) => {
-    if (marked.current.has(id)) return;
-    marked.current.add(id);
-    setLoadedCovers((count) => count + 1);
-  }, []);
+  const onCoverLoad = useCallback(
+    (id: string) => {
+      reportLoaded(id);
+    },
+    [reportLoaded]
+  );
 
   const openArtwork = useCallback(
     async (id: string) => {
@@ -124,17 +84,10 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
 
   return (
     <>
-      <AnimatePresence>
-        {!assetsReady && (
-          <LoadingScreen loaded={loadedCovers} total={totalCovers} />
-        )}
-      </AnimatePresence>
-
       <div
         className="columns-1 sm:columns-2 xl:columns-3 gap-5 sm:gap-7"
         aria-busy={!assetsReady}
         data-gallery-ready={assetsReady ? "true" : "false"}
-        data-covers-loaded={`${loadedCovers}/${totalCovers}`}
       >
         {artworks.map((artwork) => (
           <RevealItem key={artwork.id} ready={assetsReady}>
