@@ -211,7 +211,7 @@ export default function ArtworkModal({
                   layoutId={frameLayoutId}
                 />
 
-                <div className="flex w-full md:w-80 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
+                <div className="flex w-full md:w-96 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
                   <div>
                     <p className="label text-ink/35">
                       {activeIndex + 1} / {artworks.length}
