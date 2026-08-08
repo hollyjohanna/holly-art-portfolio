@@ -3,6 +3,7 @@ import { Archivo, Inter } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import LoadingGate from "@/components/LoadingGate";
+import ScrollbarActivity from "@/components/ScrollbarActivity";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -44,6 +45,7 @@ export default function RootLayout({
           <Nav />
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />
+          <ScrollbarActivity />
         </LoadingGate>
       </body>
     </html>
