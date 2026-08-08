@@ -11,6 +11,8 @@ export type Artwork = {
   medium: string;
   dimensions: string;
   description: string;
+  /** Optional sale price in dollars; shown in the modal when set. */
+  price?: number;
   /** First image is the cover shown on the Works page. */
   images: ArtworkImage[];
 };
@@ -24,11 +26,13 @@ export type Artwork = {
 export const artworks: Artwork[] = [
   {
     "id": "coke",
-    "title": "Coke",
-    "year": 0,
-    "medium": "[Medium]",
-    "dimensions": "[Dimensions]",
-    "description": "Placeholder text — a short note about this piece will go here.",
+    "title": "Coke / Cans Trio 3",
+    "year": 2026,
+    "medium": "Acrylic on canvas",
+    "dimensions": "8 × 12 inch",
+    "price": 150,
+    "description":
+      "The third and final painting of the cans trio, this piece, like the other two, was inspired by the simplistic beauty of what is fundamentally a piece of garbage.\n\nThese works explore my affection for the humble crumpled can by pushing the colours to be slightly more saturated while maintaining the realism of the subject. It highlights the characteristic way light bounces off the aluminium, and demonstrates the juxtaposition of such a beautiful item with its unfortunate eventual purpose: to become trash in a landfill.\n\nBy using a bright, flat background of complementary colour and maintaining realism, these pieces explore my intrigue with the complexity and beauty of waste, as well as themes of overconsumption, diet culture, and the influence of marketing and branding.\n\nI consider this to be the star piece of the cans trio.",
     "images": [
       {
         "src": "/works/coke/01.jpg",
@@ -129,11 +133,13 @@ export const artworks: Artwork[] = [
   },
   {
     "id": "fanta",
-    "title": "Fanta",
-    "year": 0,
-    "medium": "[Medium]",
-    "dimensions": "[Dimensions]",
-    "description": "Placeholder text — a short note about this piece will go here.",
+    "title": "Fanta / Cans Trio 1",
+    "year": 2025,
+    "medium": "Acrylic on canvas",
+    "dimensions": "8 × 12 inch",
+    "price": 150,
+    "description":
+      "The first painting of the cans trio, this piece, like the other two, was inspired by the simplistic beauty of what is fundamentally a piece of garbage.\n\nThese works explore my affection for the humble crumpled can by pushing the colours to be slightly more saturated while maintaining the realism of the subject. It highlights the characteristic way light bounces off the aluminium, and demonstrates the juxtaposition of such a beautiful item with its unfortunate eventual purpose: to become trash in a landfill.\n\nBy using a bright, flat background of complementary colour and maintaining realism, these pieces explore my intrigue with the complexity and beauty of waste, as well as themes of overconsumption, diet culture, and the influence of marketing and branding.",
     "images": [
       {
         "src": "/works/fanta/01.jpg",
@@ -404,11 +410,13 @@ export const artworks: Artwork[] = [
   },
   {
     "id": "sprite",
-    "title": "Sprite",
-    "year": 0,
-    "medium": "[Medium]",
-    "dimensions": "[Dimensions]",
-    "description": "Placeholder text — a short note about this piece will go here.",
+    "title": "Sprite / Cans Trio 2",
+    "year": 2026,
+    "medium": "Acrylic on canvas",
+    "dimensions": "8 × 12 inch",
+    "price": 150,
+    "description":
+      "The second painting of the cans trio, this piece, like the other two, was inspired by the simplistic beauty of what is fundamentally a piece of garbage.\n\nThese works explore my affection for the humble crumpled can by pushing the colours to be slightly more saturated while maintaining the realism of the subject. It highlights the characteristic way light bounces off the aluminium, and demonstrates the juxtaposition of such a beautiful item with its unfortunate eventual purpose: to become trash in a landfill.\n\nBy using a bright, flat background of complementary colour and maintaining realism, these pieces explore my intrigue with the complexity and beauty of waste, as well as themes of overconsumption, diet culture, and the influence of marketing and branding.",
     "images": [
       {
         "src": "/works/sprite/01.jpg",

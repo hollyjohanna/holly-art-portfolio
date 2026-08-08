@@ -223,8 +223,13 @@ export default function ArtworkModal({
                   <div className="label text-ink/45">
                     {artwork.year || "[Year]"} &middot; {artwork.medium}
                   </div>
+                  {artwork.price != null ? (
+                    <div className="text-xs text-ink/45">
+                      ${artwork.price} - contact me to purchase
+                    </div>
+                  ) : null}
                   <div className="text-xs text-ink/45">{artwork.dimensions}</div>
-                  <p className="text-[13px] leading-relaxed text-ink/65">
+                  <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink/65">
                     {artwork.description}
                   </p>
                   <div className="mt-auto flex gap-6 border-t border-rule pt-4">
