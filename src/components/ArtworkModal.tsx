@@ -180,81 +180,83 @@ export default function ArtworkModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35, ease: EASE }}
           onClick={requestClose}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/55 backdrop-blur-md p-4 sm:p-8"
+          className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain bg-ink/55 backdrop-blur-md"
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full md:w-auto max-w-6xl"
-          >
-            <button
-              type="button"
-              onClick={requestClose}
-              aria-label="Close"
-              className="absolute -top-3 -right-3 md:-top-4 md:-right-4 z-20 flex h-9 w-9 items-center justify-center border-hairline bg-cream text-base text-ink/70 shadow-soft transition-colors duration-300 hover:bg-rose/25 hover:text-ink active:translate-y-[1px]"
+          <div className="flex min-h-full items-center justify-center p-4 py-10 sm:p-8">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full md:w-auto max-w-6xl"
             >
-              ×
-            </button>
-
-            <AnimatePresence mode="popLayout" custom={artworkDirection} initial={false}>
-              <motion.div
-                key={artwork.id}
-                custom={artworkDirection}
-                variants={artworkSlideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.4, ease: EASE }}
-                className="relative flex w-full flex-col md:flex-row md:items-stretch gap-4 md:gap-0"
+              <button
+                type="button"
+                onClick={requestClose}
+                aria-label="Close"
+                className="fixed top-3 right-3 z-30 flex h-10 w-10 items-center justify-center border-hairline bg-cream text-base text-ink/70 shadow-soft transition-colors duration-300 hover:bg-rose/25 hover:text-ink active:translate-y-[1px] md:absolute md:-top-4 md:-right-4 md:h-9 md:w-9"
               >
-                <ArtworkPhotoStage
-                  artwork={artwork}
-                  layoutId={frameLayoutId}
-                />
+                ×
+              </button>
 
-                <div className="flex w-full md:w-96 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
-                  <div>
-                    <p className="label text-ink/35">
-                      {activeIndex + 1} / {artworks.length}
-                    </p>
-                    <h2 className="mt-2 font-display text-xl leading-snug">
-                      {artwork.title}
-                    </h2>
-                  </div>
-                  <div className="label text-ink/45">
-                    {artwork.year || "[Year]"} &middot; {artwork.medium}
-                  </div>
-                  {artwork.price != null ? (
-                    <div className="text-xs text-ink/45">
-                      ${artwork.price} - contact me to purchase
+              <AnimatePresence mode="popLayout" custom={artworkDirection} initial={false}>
+                <motion.div
+                  key={artwork.id}
+                  custom={artworkDirection}
+                  variants={artworkSlideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: EASE }}
+                  className="relative flex w-full flex-col md:flex-row md:items-stretch gap-4 md:gap-0"
+                >
+                  <ArtworkPhotoStage
+                    artwork={artwork}
+                    layoutId={frameLayoutId}
+                  />
+
+                  <div className="flex w-full md:w-96 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
+                    <div>
+                      <p className="label text-ink/35">
+                        {activeIndex + 1} / {artworks.length}
+                      </p>
+                      <h2 className="mt-2 font-display text-xl leading-snug">
+                        {artwork.title}
+                      </h2>
                     </div>
-                  ) : null}
-                  <div className="text-xs text-ink/45">{artwork.dimensions}</div>
-                  <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink/65">
-                    {artwork.description}
-                  </p>
-                  <div className="mt-auto flex gap-6 border-t border-rule pt-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void goPrevArtwork();
-                      }}
-                      className="label text-ink/50 transition-colors duration-300 hover:text-ink"
-                    >
-                      Prev work
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void goNextArtwork();
-                      }}
-                      className="label text-ink/50 transition-colors duration-300 hover:text-ink"
-                    >
-                      Next work
-                    </button>
+                    <div className="label text-ink/45">
+                      {artwork.year || "[Year]"} &middot; {artwork.medium}
+                    </div>
+                    {artwork.price != null ? (
+                      <div className="text-xs text-ink/45">
+                        ${artwork.price} - contact me to purchase
+                      </div>
+                    ) : null}
+                    <div className="text-xs text-ink/45">{artwork.dimensions}</div>
+                    <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink/65">
+                      {artwork.description}
+                    </p>
+                    <div className="mt-auto flex gap-6 border-t border-rule pt-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void goPrevArtwork();
+                        }}
+                        className="label text-ink/50 transition-colors duration-300 hover:text-ink"
+                      >
+                        Prev work
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void goNextArtwork();
+                        }}
+                        className="label text-ink/50 transition-colors duration-300 hover:text-ink"
+                      >
+                        Next work
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
         </motion.div>
       )}
@@ -402,7 +404,7 @@ function ArtworkPhotoStage({
         width={currentImage.width}
         height={currentImage.height}
         decoding="sync"
-        className="pointer-events-none block max-h-[50vh] w-auto max-w-full opacity-0 md:max-h-[85vh]"
+        className="pointer-events-none block max-h-[42vh] w-auto max-w-full opacity-0 md:max-h-[85vh]"
       />
 
       <div className="absolute inset-0 overflow-hidden">

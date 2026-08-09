@@ -33,7 +33,7 @@ export default function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative label px-4 py-2"
+                className="relative label font-display px-4 py-2"
               >
                 {active && (
                   <motion.span
@@ -100,7 +100,7 @@ export default function Nav() {
                     key={link.href}
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`label px-6 py-4 border-b border-rule transition-colors duration-300 ${
+                    className={`label font-display px-6 py-4 border-b border-rule transition-colors duration-300 ${
                       active
                         ? "bg-gold/40 text-ink/90"
                         : "text-ink/50 hover:bg-ink/[0.03] hover:text-ink/80"

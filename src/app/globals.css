@@ -23,7 +23,7 @@
   --color-rule: var(--rule);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-display: var(--font-archivo);
+  --font-display: var(--font-julius-sans-one);
   --font-sans: var(--font-inter);
 }
 
@@ -114,8 +114,14 @@ html.scrollbar-active .scroll-indicator {
 
 @layer utilities {
   .font-display {
-    font-weight: 600;
-    letter-spacing: -0.015em;
+    font-family: var(--font-display), "Julius Sans One", sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+
+  /* Julius Sans One is single-weight — keep labels from forcing 500 on it */
+  .label.font-display {
+    font-weight: 400;
   }
 
   /* Small caps-style label used for nav, captions, buttons and form labels */

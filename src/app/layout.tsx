@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Archivo, Inter } from "next/font/google";
+import { Inter, Julius_Sans_One } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import LoadingGate from "@/components/LoadingGate";
 import ScrollbarActivity from "@/components/ScrollbarActivity";
 import "./globals.css";
 
-const archivo = Archivo({
-  variable: "--font-archivo",
-  weight: ["500", "600"],
+const juliusSansOne = Julius_Sans_One({
+  variable: "--font-julius-sans-one",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${inter.variable} h-full antialiased`}
+      className={`${juliusSansOne.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <LoadingGate>
