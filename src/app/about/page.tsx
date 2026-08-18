@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
+import SocialLinks from "@/components/SocialLinks";
 
 export const metadata: Metadata = {
   title: "About - Holly Johanna",
@@ -71,6 +72,7 @@ export default function AboutPage() {
             shows, commission availability, or simply an invite to get in
             touch via the Contact page.
           </p>
+          <SocialLinks className="mt-2" />
         </Reveal>
       </div>
     </div>

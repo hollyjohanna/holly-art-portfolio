@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 const LINKS = [
   { href: "/", label: "Works" },
@@ -11,9 +11,46 @@ const LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
+/** Matches the pill's old `inset-x-3` (0.75rem either side, at the default
+ *  16px root size) now that its position is measured in pixels instead of
+ *  being pinned with Tailwind insets. */
+const PILL_INSET_PX = 12;
+
 export default function Nav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navRowRef = useRef<HTMLElement>(null);
+  const linkRefs = useRef<Partial<Record<string, HTMLAnchorElement>>>({});
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(
+    null
+  );
+
+  // Measured in DOM-local coordinates (relative to the nav row itself), not
+  // the viewport — so unlike a layoutId/shared-layout FLIP animation, this
+  // can't be thrown off by sticky positioning, scroll position, or the
+  // scroll clamp that happens when navigating from a tall page to a short
+  // one. The pill only ever moves along x.
+  useLayoutEffect(() => {
+    const measure = () => {
+      const row = navRowRef.current;
+      const activeLink = linkRefs.current[pathname];
+      if (!row || !activeLink) {
+        setPill(null);
+        return;
+      }
+      const rowRect = row.getBoundingClientRect();
+      const linkRect = activeLink.getBoundingClientRect();
+      setPill({
+        left: linkRect.left - rowRect.left + PILL_INSET_PX,
+        width: linkRect.width - PILL_INSET_PX * 2,
+      });
+    };
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 bg-cream/90 backdrop-blur-sm border-b border-rule">
@@ -26,27 +63,33 @@ export default function Nav() {
           Holly Johanna
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-1 lg:-mr-4">
+        <nav
+          ref={navRowRef}
+          className="relative hidden sm:flex items-center gap-1 lg:-mr-4"
+        >
+          {pill && (
+            <motion.span
+              className="pointer-events-none absolute bottom-1 h-px"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-blue))",
+                opacity: 0.45,
+              }}
+              animate={{ left: pill.left, width: pill.width }}
+              transition={{ type: "spring", stiffness: 400, damping: 34 }}
+            />
+          )}
           {LINKS.map((link) => {
             const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative label font-display px-4 py-2"
+                ref={(el) => {
+                  linkRefs.current[link.href] = el ?? undefined;
+                }}
+                className="label font-display px-4 py-2"
               >
-                {active && (
-                  <motion.span
-                    layoutId="nav-active-pill"
-                    className="absolute inset-x-3 bottom-1 h-px"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-blue))",
-                      opacity: 0.45,
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 34 }}
-                  />
-                )}
                 <motion.span
                   className={
                     active
