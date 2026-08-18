@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 /** Seconds the page takes to "catch up" to wherever the wheel/trackpad is
@@ -27,6 +28,19 @@ export function easeOutCubic(t: number) {
 export const lenisRef: { current: Lenis | null } = { current: null };
 
 export default function SmoothScroll() {
+  const pathname = usePathname();
+
+  // Lenis auto-resizes via a ResizeObserver on <html>, but <html> is pinned
+  // to the viewport height (Tailwind's h-full), so that box never actually
+  // resizes when a client-side route swap changes body content height —
+  // e.g. leaving a short page (About/Contact) for the tall Works gallery.
+  // Lenis then keeps clamping scroll to the old page's height until a full
+  // reload re-measures from scratch. Force a fresh measurement on every
+  // navigation instead of waiting for a resize that will never come.
+  useEffect(() => {
+    lenisRef.current?.resize();
+  }, [pathname]);
+
   useEffect(() => {
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
