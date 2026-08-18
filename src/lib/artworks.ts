@@ -405,6 +405,16 @@ export const artworks: Artwork[] = [
         "src": "/works/purple-wheel/01.jpg",
         "width": 1402,
         "height": 1800
+      },
+      {
+        "src": "/works/purple-wheel/02.jpg",
+        "width": 1800,
+        "height": 1350
+      },
+      {
+        "src": "/works/purple-wheel/03.jpg",
+        "width": 1800,
+        "height": 1350
       }
     ]
   },
