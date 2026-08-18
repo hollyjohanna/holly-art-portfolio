@@ -4,6 +4,8 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import LoadingGate from "@/components/LoadingGate";
 import ScrollbarActivity from "@/components/ScrollbarActivity";
+import SmoothScroll from "@/components/SmoothScroll";
+import BackToTop from "@/components/BackToTop";
 import "./globals.css";
 
 const juliusSansOne = Julius_Sans_One({
@@ -41,12 +43,14 @@ export default function RootLayout({
       className={`${juliusSansOne.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream text-ink">
+        <SmoothScroll />
         <LoadingGate>
           <Nav />
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />
           <ScrollbarActivity />
         </LoadingGate>
+        <BackToTop />
       </body>
     </html>
   );

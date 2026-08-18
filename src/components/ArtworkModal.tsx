@@ -180,6 +180,7 @@ export default function ArtworkModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35, ease: EASE }}
           onClick={requestClose}
+          data-lenis-prevent
           className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain bg-ink/55 backdrop-blur-md"
         >
           <div className="flex min-h-full items-center justify-center p-4 py-10 sm:p-8">

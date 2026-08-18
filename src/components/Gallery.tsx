@@ -8,8 +8,10 @@ import { useLoadingGate } from "@/components/LoadingGate";
 import { preloadImages } from "@/lib/preload";
 
 /** How far the card rises while scrubbing in (CSS rem) — kept in sync with
- *  the fallback value in globals.css for the pre-hydration state. */
-const RISE_REM = 9;
+ *  the fallback value in globals.css for the pre-hydration state. Bumped up
+ *  from 9 so the reveal reads clearly even at a glance, now that SmoothScroll
+ *  (see SmoothScroll.tsx) caps how fast the page can move underneath it. */
+const RISE_REM = 14;
 
 /** Fraction of viewport height where the scrub starts (card's top just
  *  below the fold) and ends (card's top has nearly scrolled past the top
@@ -123,8 +125,6 @@ function RevealItem({
 }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-  /** Once fully revealed, stay at 1 until the card leaves through the bottom. */
-  const lockedRef = useRef(false);
   /** Cards already sitting in the viewport the moment we go "ready" (i.e.
    *  before the user has scrolled at all) never scrub — they're just there,
    *  fully loaded, like the rest of the page. */
@@ -148,7 +148,6 @@ function RevealItem({
     ).matches;
 
     if (reduceMotion) {
-      lockedRef.current = true;
       apply(1);
       return;
     }
@@ -159,12 +158,12 @@ function RevealItem({
 
       // First frame after "ready": anything already on screen (the initial
       // handful of works) snaps straight to fully loaded — no fade, no
-      // rise. Only cards below the fold get the scroll-scrubbed reveal.
+      // rise — and stays exempt permanently, even if scrolled out of view
+      // and back. Only cards below the fold get the scroll-scrubbed reveal.
       if (firstRunRef.current) {
         firstRunRef.current = false;
         if (rect.top < vh) {
           preRevealedRef.current = true;
-          lockedRef.current = true;
           apply(1);
           return;
         }
@@ -175,14 +174,15 @@ function RevealItem({
         return;
       }
 
+      // No permanent lock: progress tracks the card's position on every
+      // frame, so scrolling back up fades it back out at the same pace it
+      // faded in, exactly mirroring the reveal.
       if (rect.top >= vh) {
-        lockedRef.current = false;
         apply(0);
         return;
       }
 
-      if (lockedRef.current || rect.bottom <= 0) {
-        lockedRef.current = true;
+      if (rect.bottom <= 0) {
         apply(1);
         return;
       }
@@ -192,7 +192,6 @@ function RevealItem({
       let progress = (start - rect.top) / (start - end);
       progress = Math.min(1, Math.max(0, progress));
 
-      if (progress >= 1) lockedRef.current = true;
       apply(easeOutQuart(progress));
     };
 
