@@ -30,6 +30,7 @@ export default function LoadingScreen({
               "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-blue), var(--color-gold))",
             backgroundSize: "200% 100%",
           }}
+          initial={{ width: "0%", backgroundPosition: "0% 0%" }}
           animate={{
             width: `${Math.max(8, pct * 100)}%`,
             backgroundPosition: ["0% 0%", "200% 0%"],

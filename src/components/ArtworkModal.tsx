@@ -48,8 +48,10 @@ export default function ArtworkModal({
   const [artworkDirection, setArtworkDirection] = useState(0);
   const [sharedElement, setSharedElement] = useState(true);
   const [photosReady, setPhotosReady] = useState(false);
+  const [switchingArtwork, setSwitchingArtwork] = useState(false);
   const wasOpenRef = useRef(false);
   const closeAfterSharedRef = useRef(false);
+  const isSwitchingArtworkRef = useRef(false);
 
   // Never morph/show the modal until this piece's full-res photos are decoded.
   useEffect(() => {
@@ -112,23 +114,31 @@ export default function ArtworkModal({
   }, [activeIndex, artworks, photosReady]);
 
   const goPrevArtwork = useCallback(async () => {
-    if (activeIndex < 0) return;
-    setSharedElement(false);
-    setArtworkDirection(-1);
+    if (activeIndex < 0 || isSwitchingArtworkRef.current) return;
+    isSwitchingArtworkRef.current = true;
+    setSwitchingArtwork(true);
     const prevIndex = (activeIndex - 1 + artworks.length) % artworks.length;
     const next = artworks[prevIndex];
     await preloadImages(next.images.map((image) => image.src));
+    setSharedElement(false);
+    setArtworkDirection(-1);
     onNavigate(next.id);
+    isSwitchingArtworkRef.current = false;
+    setSwitchingArtwork(false);
   }, [activeIndex, artworks, onNavigate]);
 
   const goNextArtwork = useCallback(async () => {
-    if (activeIndex < 0) return;
-    setSharedElement(false);
-    setArtworkDirection(1);
+    if (activeIndex < 0 || isSwitchingArtworkRef.current) return;
+    isSwitchingArtworkRef.current = true;
+    setSwitchingArtwork(true);
     const nextIndex = (activeIndex + 1) % artworks.length;
     const next = artworks[nextIndex];
     await preloadImages(next.images.map((image) => image.src));
+    setSharedElement(false);
+    setArtworkDirection(1);
     onNavigate(next.id);
+    isSwitchingArtworkRef.current = false;
+    setSwitchingArtwork(false);
   }, [activeIndex, artworks, onNavigate]);
 
   const requestClose = useCallback(() => {
@@ -197,66 +207,77 @@ export default function ArtworkModal({
                 ×
               </button>
 
-              <AnimatePresence mode="popLayout" custom={artworkDirection} initial={false}>
-                <motion.div
-                  key={artwork.id}
-                  custom={artworkDirection}
-                  variants={artworkSlideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.4, ease: EASE }}
-                  className="relative flex w-full flex-col md:flex-row md:items-stretch gap-4 md:gap-0"
-                >
-                  <ArtworkPhotoStage
-                    artwork={artwork}
-                    layoutId={frameLayoutId}
-                  />
+              <div className="overflow-hidden">
+                <AnimatePresence mode="popLayout" custom={artworkDirection} initial={false}>
+                  <motion.div
+                    key={artwork.id}
+                    custom={artworkDirection}
+                    variants={artworkSlideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ duration: 0.4, ease: EASE }}
+                    className="relative flex w-full flex-col md:flex-row md:items-stretch gap-4 md:gap-0"
+                  >
+                    <ArtworkPhotoStage
+                      key={artwork.id}
+                      artwork={artwork}
+                      layoutId={frameLayoutId}
+                    />
 
-                  <div className="flex w-full md:w-96 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
-                    <div>
-                      <p className="label text-ink/35">
-                        {activeIndex + 1} / {artworks.length}
-                      </p>
-                      <h2 className="mt-2 font-display text-xl leading-snug">
-                        {artwork.title}
-                      </h2>
-                    </div>
-                    <div className="label text-ink/45">
-                      {artwork.year || "[Year]"} &middot; {artwork.medium}
-                    </div>
-                    {artwork.price != null ? (
-                      <div className="text-xs text-ink/45">
-                        ${artwork.price} - contact me to purchase
+                    <div className="flex w-full md:w-96 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
+                      <div>
+                        <p className="label text-ink/35">
+                          {activeIndex + 1} / {artworks.length}
+                        </p>
+                        <h2 className="mt-2 font-display text-xl leading-snug">
+                          {artwork.title}
+                        </h2>
                       </div>
-                    ) : null}
-                    <div className="text-xs text-ink/45">{artwork.dimensions}</div>
-                    <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink/65">
-                      {artwork.description}
-                    </p>
-                    <div className="mt-auto flex gap-6 border-t border-rule pt-4">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void goPrevArtwork();
-                        }}
-                        className="label text-ink/50 transition-colors duration-300 hover:text-ink"
-                      >
-                        Prev work
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void goNextArtwork();
-                        }}
-                        className="label text-ink/50 transition-colors duration-300 hover:text-ink"
-                      >
-                        Next work
-                      </button>
+                      <div className="label text-ink/45">
+                        {artwork.year || "[Year]"} &middot; {artwork.medium}
+                      </div>
+                      {artwork.price != null ? (
+                        <div className="text-xs text-ink/45">
+                          ${artwork.price} - contact me to purchase
+                        </div>
+                      ) : null}
+                      <div className="text-xs text-ink/45">{artwork.dimensions}</div>
+                      <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink/65">
+                        {artwork.description}
+                      </p>
+                      <div className="mt-auto flex items-center gap-6 border-t border-rule pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            void goPrevArtwork();
+                          }}
+                          disabled={switchingArtwork}
+                          className="label text-ink/50 transition-colors duration-300 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+                        >
+                          Prev work
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            void goNextArtwork();
+                          }}
+                          disabled={switchingArtwork}
+                          className="label text-ink/50 transition-colors duration-300 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+                        >
+                          Next work
+                        </button>
+                        {switchingArtwork && (
+                          <span
+                            aria-hidden
+                            className="h-3 w-3 flex-shrink-0 animate-spin rounded-full border border-ink/25 border-t-ink/60"
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -279,6 +300,7 @@ function ArtworkPhotoStage({
   const [trackInstant, setTrackInstant] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const hideTimerRef = useRef<number | null>(null);
+  const isAnimatingRef = useRef(false);
 
   const trackSlides = hasMultiple
     ? [images[images.length - 1], ...images, images[0]]
@@ -293,18 +315,21 @@ function ArtworkPhotoStage({
   }, [trackInstant, trackIndex]);
 
   const goPrevImage = useCallback(() => {
-    if (!hasMultiple) return;
+    if (!hasMultiple || isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
     setTrackIndex((i) => i - 1);
   }, [hasMultiple]);
 
   const goNextImage = useCallback(() => {
-    if (!hasMultiple) return;
+    if (!hasMultiple || isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
     setTrackIndex((i) => i + 1);
   }, [hasMultiple]);
 
   const goToImage = useCallback(
     (nextIndex: number) => {
-      if (!hasMultiple || nextIndex === imageIndex) return;
+      if (!hasMultiple || nextIndex === imageIndex || isAnimatingRef.current) return;
+      isAnimatingRef.current = true;
       setTrackIndex(nextIndex + 1);
     },
     [hasMultiple, imageIndex]
@@ -318,6 +343,7 @@ function ArtworkPhotoStage({
       setTrackInstant(true);
       setTrackIndex(last);
       setImageIndex(last - 1);
+      isAnimatingRef.current = false;
       return;
     }
 
@@ -325,12 +351,14 @@ function ArtworkPhotoStage({
       setTrackInstant(true);
       setTrackIndex(1);
       setImageIndex(0);
+      isAnimatingRef.current = false;
       return;
     }
 
     if (trackIndex >= 1 && trackIndex <= last) {
       setImageIndex(trackIndex - 1);
     }
+    isAnimatingRef.current = false;
   }, [hasMultiple, images.length, trackIndex, trackInstant]);
 
   useEffect(() => {

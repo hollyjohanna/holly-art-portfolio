@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Artwork } from "@/lib/artworks";
 import ArtworkCard from "@/components/ArtworkCard";
 import ArtworkModal from "@/components/ArtworkModal";
@@ -34,16 +34,44 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
 
   const totalCovers = artworks.filter((a) => a.images[0]).length;
 
-  const allSrcs = useMemo(
-    () =>
-      artworks.flatMap((artwork) => artwork.images.map((image) => image.src)),
-    [artworks]
-  );
-
-  // Start warming every full-res photo immediately — modal opens use these.
+  // Gently warm the rest of the gallery's full-res photos in the background,
+  // one work at a time, once the page has settled. Firing every work's
+  // images at once (as this used to) floods the browser's connection pool
+  // and starves whichever image the modal actually needs next — the modal's
+  // own open/neighbour preloading (see ArtworkModal) stays the fast path for
+  // whatever the visitor is actively looking at; this is just a slow trickle
+  // behind it so a later, unrelated open is more likely to feel instant too.
   useEffect(() => {
-    void preloadImages(allSrcs);
-  }, [allSrcs]);
+    if (!assetsReady || activeId) return;
+    let cancelled = false;
+
+    const idle = (cb: () => void) => {
+      if (typeof window.requestIdleCallback === "function") {
+        return window.requestIdleCallback(cb, { timeout: 2000 });
+      }
+      return window.setTimeout(cb, 300);
+    };
+
+    async function warmRestOfGallery() {
+      for (const artwork of artworks) {
+        if (cancelled) return;
+        await preloadImages(artwork.images.map((image) => image.src));
+      }
+    }
+
+    const handle = idle(() => {
+      void warmRestOfGallery();
+    });
+
+    return () => {
+      cancelled = true;
+      if (typeof handle === "number") {
+        window.clearTimeout(handle);
+      } else if (typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(handle);
+      }
+    };
+  }, [artworks, assetsReady, activeId]);
 
   // Tell the shared loading gate how many covers it's waiting on.
   useEffect(() => {
