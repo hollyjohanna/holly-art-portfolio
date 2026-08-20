@@ -1,5 +1,7 @@
 import Gallery from "@/components/Gallery";
+import FeaturedOtherWorks from "@/components/FeaturedOtherWorks";
 import { artworks } from "@/lib/artworks";
+import { featuredOtherWorks } from "@/lib/featuredOtherWorks";
 
 export default function WorksPage() {
   return (
@@ -11,6 +13,7 @@ export default function WorksPage() {
         </p>
       </header>
       <Gallery artworks={artworks} />
+      <FeaturedOtherWorks works={featuredOtherWorks} />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const LINKS = [
   { href: "/", label: "Works" },
@@ -19,9 +19,16 @@ const PILL_INSET_PX = 12;
 export default function Nav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [worksMenuOpen, setWorksMenuOpen] = useState(false);
+  const [mobileWorksOpen, setMobileWorksOpen] = useState(false);
+  const worksWrapperRef = useRef<HTMLDivElement>(null);
+
+  // The Other Works page is a sub-section of Works, so it keeps the Works
+  // pill/highlight active rather than showing no active link at all.
+  const activeHref = pathname === "/other-works" ? "/" : pathname;
 
   const navRowRef = useRef<HTMLElement>(null);
-  const linkRefs = useRef<Partial<Record<string, HTMLAnchorElement>>>({});
+  const linkRefs = useRef<Partial<Record<string, HTMLElement>>>({});
   const [pill, setPill] = useState<{ left: number; width: number } | null>(
     null
   );
@@ -34,7 +41,7 @@ export default function Nav() {
   useLayoutEffect(() => {
     const measure = () => {
       const row = navRowRef.current;
-      const activeLink = linkRefs.current[pathname];
+      const activeLink = linkRefs.current[activeHref];
       if (!row || !activeLink) {
         setPill(null);
         return;
@@ -50,7 +57,37 @@ export default function Nav() {
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
+  }, [activeHref]);
+
+  // Dropdown is click-triggered only — close it on navigation, on an
+  // outside click, and on Escape, so it never lingers on the Other Works
+  // page (or anywhere else) unless the visitor deliberately opens it.
+  useEffect(() => {
+    setWorksMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!worksMenuOpen) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (
+        worksWrapperRef.current &&
+        !worksWrapperRef.current.contains(e.target as Node)
+      ) {
+        setWorksMenuOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setWorksMenuOpen(false);
+    };
+
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [worksMenuOpen]);
 
   return (
     <header className="sticky top-0 z-50 bg-cream/90 backdrop-blur-sm border-b border-rule">
@@ -69,7 +106,7 @@ export default function Nav() {
         >
           {pill && (
             <motion.span
-              className="pointer-events-none absolute bottom-1 h-px"
+              className="pointer-events-none absolute bottom-0 h-px"
               style={{
                 backgroundImage:
                   "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-blue))",
@@ -80,7 +117,73 @@ export default function Nav() {
             />
           )}
           {LINKS.map((link) => {
-            const active = pathname === link.href;
+            const active = link.href === activeHref;
+
+            if (link.href === "/") {
+              return (
+                <div key={link.href} ref={worksWrapperRef} className="relative">
+                  <button
+                    type="button"
+                    ref={(el) => {
+                      linkRefs.current[link.href] = el ?? undefined;
+                    }}
+                    onClick={() => setWorksMenuOpen((v) => !v)}
+                    aria-expanded={worksMenuOpen}
+                    className="label font-display flex items-center px-4 py-2"
+                  >
+                    <motion.span
+                      className={
+                        active
+                          ? "text-ink/90"
+                          : "text-ink/45 transition-colors duration-300 hover:text-ink/80"
+                      }
+                      whileTap={{ scale: 0.96 }}
+                    >
+                      {link.label}
+                    </motion.span>
+                    <Caret open={worksMenuOpen} />
+                  </button>
+
+                  <AnimatePresence>
+                    {worksMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                        className="absolute left-1/2 top-full z-40 -translate-x-1/2 pt-2"
+                      >
+                        <div className="flex min-w-[9rem] flex-col overflow-hidden border-hairline bg-cream shadow-soft">
+                          <Link
+                            href="/"
+                            onClick={() => setWorksMenuOpen(false)}
+                            className={`label px-4 py-2.5 text-center transition-colors duration-300 ${
+                              pathname === "/"
+                                ? "bg-gold/25 text-ink/85"
+                                : "text-ink/55 hover:bg-ink/[0.03] hover:text-ink/85"
+                            }`}
+                          >
+                            Paintings
+                          </Link>
+                          <Link
+                            href="/other-works"
+                            onClick={() => setWorksMenuOpen(false)}
+                            className={`label border-t border-rule px-4 py-2.5 text-center transition-colors duration-300 ${
+                              pathname === "/other-works"
+                                ? "bg-gold/25 text-ink/85"
+                                : "text-ink/55 hover:bg-ink/[0.03] hover:text-ink/85"
+                            }`}
+                          >
+                            Other works
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={link.href}
@@ -137,7 +240,68 @@ export default function Nav() {
           >
             <div className="flex flex-col">
               {LINKS.map((link) => {
-                const active = pathname === link.href;
+                const active = link.href === activeHref;
+
+                if (link.href === "/") {
+                  return (
+                    <div key={link.href} className="border-b border-rule">
+                      <button
+                        type="button"
+                        onClick={() => setMobileWorksOpen((v) => !v)}
+                        aria-expanded={mobileWorksOpen}
+                        className={`label font-display flex w-full items-center justify-between px-6 py-4 transition-colors duration-300 ${
+                          active
+                            ? "bg-gold/40 text-ink/90"
+                            : "text-ink/50 hover:bg-ink/[0.03] hover:text-ink/80"
+                        }`}
+                      >
+                        {link.label}
+                        <Caret open={mobileWorksOpen} />
+                      </button>
+                      <AnimatePresence>
+                        {mobileWorksOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden bg-ink/[0.02]"
+                          >
+                            <Link
+                              href="/"
+                              onClick={() => {
+                                setMenuOpen(false);
+                                setMobileWorksOpen(false);
+                              }}
+                              className={`block px-6 py-3 pl-10 text-[11px] uppercase tracking-widest transition-colors duration-300 ${
+                                pathname === "/"
+                                  ? "text-ink/80"
+                                  : "text-ink/40 hover:text-ink/70"
+                              }`}
+                            >
+                              Paintings
+                            </Link>
+                            <Link
+                              href="/other-works"
+                              onClick={() => {
+                                setMenuOpen(false);
+                                setMobileWorksOpen(false);
+                              }}
+                              className={`block px-6 py-3 pl-10 text-[11px] uppercase tracking-widest transition-colors duration-300 ${
+                                pathname === "/other-works"
+                                  ? "text-ink/80"
+                                  : "text-ink/40 hover:text-ink/70"
+                              }`}
+                            >
+                              Other works
+                            </Link>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                }
+
                 return (
                   <Link
                     key={link.href}
@@ -158,5 +322,28 @@ export default function Nav() {
         )}
       </AnimatePresence>
     </header>
+  );
+}
+
+function Caret({ open }: { open: boolean }) {
+  return (
+    <motion.svg
+      width="8"
+      height="8"
+      viewBox="0 0 10 10"
+      fill="none"
+      aria-hidden="true"
+      animate={{ rotate: open ? 180 : 0 }}
+      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      className="ml-1.5 inline-block flex-shrink-0"
+    >
+      <path
+        d="M2 3.5L5 6.5L8 3.5"
+        stroke="currentColor"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </motion.svg>
   );
 }

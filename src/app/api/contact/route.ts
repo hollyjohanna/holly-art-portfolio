@@ -7,7 +7,8 @@ const FROM_EMAIL =
 
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 200;
-const MAX_MESSAGE_LENGTH = 5000;
+const MAX_MESSAGE_LENGTH = 1000;
+const MAX_PHONE_LENGTH = 30;
 
 // A genuine visitor takes at least a few seconds to fill the form in.
 const MIN_FILL_MS = 3000;
@@ -69,6 +70,7 @@ export async function POST(request: Request) {
     name?: string;
     email?: string;
     message?: string;
+    phone?: string;
     website?: string;
     startedAt?: number;
   };
@@ -94,10 +96,11 @@ export async function POST(request: Request) {
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const message = typeof body.message === "string" ? body.message.trim() : "";
+  const phone = typeof body.phone === "string" ? body.phone.trim() : "";
 
-  if (!email || !message) {
+  if (!name || !email || !message) {
     return NextResponse.json(
-      { error: "Email and message are required." },
+      { error: "Name, email, and message are required." },
       { status: 400 }
     );
   }
@@ -121,6 +124,13 @@ export async function POST(request: Request) {
       {
         error: `Please keep your message under ${MAX_MESSAGE_LENGTH} characters.`,
       },
+      { status: 400 }
+    );
+  }
+
+  if (phone.length > MAX_PHONE_LENGTH) {
+    return NextResponse.json(
+      { error: `Please keep your phone number under ${MAX_PHONE_LENGTH} characters.` },
       { status: 400 }
     );
   }
@@ -149,8 +159,8 @@ export async function POST(request: Request) {
       from: FROM_EMAIL,
       to: TO_EMAIL,
       replyTo: email,
-      subject: `New message from ${name || "the portfolio site"}`,
-      text: `From: ${name || "Anonymous"} <${email}>\n\n${message}`,
+      subject: `New message from ${name}`,
+      text: `From: ${name} <${email}>${phone ? `\nPhone: ${phone}` : ""}\n\n${message}`,
     });
 
     if (error) {

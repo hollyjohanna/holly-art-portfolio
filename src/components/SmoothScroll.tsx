@@ -41,6 +41,17 @@ export default function SmoothScroll() {
     lenisRef.current?.resize();
   }, [pathname]);
 
+  // The browser's native scroll restoration remembers where each page was
+  // scrolled to and replays it on reload — e.g. reloading halfway down Works
+  // drops you back halfway down instead of at the top. Opt out so every
+  // reload starts fresh at the top like a normal first visit.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -64,7 +75,16 @@ export default function SmoothScroll() {
     };
     rafId = requestAnimationFrame(raf);
 
+    // Same story as the pathname effect above, but for content that grows or
+    // shrinks without a navigation — e.g. a form validation error appearing
+    // below a field. <html> never resizes, so Lenis's cached scroll height
+    // goes stale and clamps scrolling to wherever the page used to end.
+    // Watch body directly so any in-place height change re-measures.
+    const resizeObserver = new ResizeObserver(() => lenis.resize());
+    resizeObserver.observe(document.body);
+
     return () => {
+      resizeObserver.disconnect();
       cancelAnimationFrame(rafId);
       lenis.destroy();
       lenisRef.current = null;
