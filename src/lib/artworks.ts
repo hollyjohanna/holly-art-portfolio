@@ -91,42 +91,17 @@ export const artworks: Artwork[] = [
     "images": [
       {
         "src": "/works/des-poissons/01.jpg",
-        "width": 1800,
-        "height": 1505
+        "width": 1590,
+        "height": 1800
       },
       {
         "src": "/works/des-poissons/02.jpg",
-        "width": 1350,
+        "width": 1434,
         "height": 1800
       },
       {
         "src": "/works/des-poissons/03.jpg",
-        "width": 1350,
-        "height": 1800
-      }
-    ]
-  },
-  {
-    "id": "deux-poissons",
-    "title": "Deux Poissons",
-    "year": 0,
-    "medium": "[Medium]",
-    "dimensions": "[Dimensions]",
-    "description": "Placeholder text — a short note about this piece will go here.",
-    "images": [
-      {
-        "src": "/works/deux-poissons/01.jpg",
-        "width": 1800,
-        "height": 1402
-      },
-      {
-        "src": "/works/deux-poissons/02.jpg",
-        "width": 1350,
-        "height": 1800
-      },
-      {
-        "src": "/works/deux-poissons/03.jpg",
-        "width": 1350,
+        "width": 1399,
         "height": 1800
       }
     ]
@@ -179,6 +154,36 @@ export const artworks: Artwork[] = [
       {
         "src": "/works/gold-ring/02.jpg",
         "width": 1351,
+        "height": 1800
+      }
+    ]
+  },
+  {
+    "id": "new-perspective-1",
+    "title": "New Perspective 1",
+    "year": 0,
+    "medium": "[Medium]",
+    "dimensions": "[Dimensions]",
+    "description": "Placeholder text — a short note about this piece will go here.",
+    "images": [
+      {
+        "src": "/works/new-perspective-1/01.jpg",
+        "width": 1350,
+        "height": 1800
+      },
+      {
+        "src": "/works/new-perspective-1/02.jpg",
+        "width": 1515,
+        "height": 1800
+      },
+      {
+        "src": "/works/new-perspective-1/03.jpg",
+        "width": 1295,
+        "height": 1800
+      },
+      {
+        "src": "/works/new-perspective-1/04.jpg",
+        "width": 1350,
         "height": 1800
       }
     ]
@@ -299,6 +304,31 @@ export const artworks: Artwork[] = [
     ]
   },
   {
+    "id": "deux-poissons",
+    "title": "Deux Poissons",
+    "year": 0,
+    "medium": "[Medium]",
+    "dimensions": "[Dimensions]",
+    "description": "Placeholder text — a short note about this piece will go here.",
+    "images": [
+      {
+        "src": "/works/deux-poissons/01.jpg",
+        "width": 1800,
+        "height": 1800
+      },
+      {
+        "src": "/works/deux-poissons/02.jpg",
+        "width": 1350,
+        "height": 1800
+      },
+      {
+        "src": "/works/deux-poissons/03.jpg",
+        "width": 1350,
+        "height": 1800
+      }
+    ]
+  },
+  {
     "id": "pebbles",
     "title": "Pebbles",
     "year": 0,
@@ -389,6 +419,41 @@ export const artworks: Artwork[] = [
       {
         "src": "/works/purple-forest/02.jpg",
         "width": 1350,
+        "height": 1800
+      }
+    ]
+  },
+  {
+    "id": "new-perspective-2",
+    "title": "New Perspective 2",
+    "year": 0,
+    "medium": "[Medium]",
+    "dimensions": "[Dimensions]",
+    "description": "Placeholder text — a short note about this piece will go here.",
+    "images": [
+      {
+        "src": "/works/new-perspective-2/01.jpg",
+        "width": 1491,
+        "height": 1800
+      },
+      {
+        "src": "/works/new-perspective-2/02.jpg",
+        "width": 1392,
+        "height": 1800
+      },
+      {
+        "src": "/works/new-perspective-2/03.jpg",
+        "width": 1440,
+        "height": 1800
+      },
+      {
+        "src": "/works/new-perspective-2/04.jpg",
+        "width": 1440,
+        "height": 1800
+      },
+      {
+        "src": "/works/new-perspective-2/05.jpg",
+        "width": 1439,
         "height": 1800
       }
     ]
