@@ -63,7 +63,7 @@ export default function AboutPage() {
             for a period of time soon.
           </p> */}
           <p className="text-sm sm:text-[15px] leading-relaxed text-ink/60">
-            I have always loved creating art — ask my mum just how many
+            I have always loved creating art, ask my mum just how many
             childhood paintings she has stored in the attic! My mum, in fact,
             is one of my earliest inspirations and she continues to support
             me to this day. She is endlessly inventive and taught me early on
