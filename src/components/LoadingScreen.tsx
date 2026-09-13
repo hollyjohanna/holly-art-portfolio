@@ -27,7 +27,7 @@ export default function LoadingScreen({
           className="h-full rounded-full"
           style={{
             backgroundImage:
-              "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-blue), var(--color-gold))",
+              "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-burgundy), var(--color-gold))",
             backgroundSize: "200% 100%",
           }}
           initial={{ width: "0%", backgroundPosition: "0% 0%" }}

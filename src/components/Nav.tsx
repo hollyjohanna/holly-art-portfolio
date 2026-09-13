@@ -109,7 +109,7 @@ export default function Nav() {
               className="pointer-events-none absolute bottom-0 h-px"
               style={{
                 backgroundImage:
-                  "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-blue))",
+                  "linear-gradient(90deg, var(--color-gold), var(--color-rose), var(--color-burgundy))",
                 opacity: 0.45,
               }}
               animate={{ left: pill.left, width: pill.width }}

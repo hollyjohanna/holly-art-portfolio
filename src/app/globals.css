@@ -2,8 +2,8 @@
 
 :root {
   --color-cream: #fff8e7;
-  --color-ink: #0e1104;
-  --color-blue: #93b5c6;
+  --color-ink: #14091d;
+  --color-burgundy: #62344c;
   --color-gold: #f4dd90;
   --color-rose: #c76b84;
 
@@ -17,7 +17,7 @@
 @theme inline {
   --color-cream: var(--color-cream);
   --color-ink: var(--color-ink);
-  --color-blue: var(--color-blue);
+  --color-burgundy: var(--color-burgundy);
   --color-gold: var(--color-gold);
   --color-rose: var(--color-rose);
   --color-rule: var(--rule);
@@ -79,7 +79,7 @@ html.scrollbar-active .scroll-indicator {
     180deg,
     var(--color-gold) 0%,
     var(--color-rose) 45%,
-    var(--color-blue) 100%
+    var(--color-burgundy) 100%
   );
   will-change: transform;
   animation: scroll-indicator-thumb linear;

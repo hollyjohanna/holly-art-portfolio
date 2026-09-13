@@ -74,7 +74,7 @@ const SOCIALS: Social[] = [
   {
     label: "Website",
     href: "https://www.hollidayrobbins.com",
-    color: "var(--color-blue)",
+    color: "var(--color-burgundy)",
     Icon: GlobeIcon,
   },
   {
