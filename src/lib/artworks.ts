@@ -484,6 +484,46 @@ export const artworks: Artwork[] = [
     ]
   },
   {
+    "id": "snowy-trees",
+    "title": "Snowy Trees",
+    "year": 0,
+    "medium": "[Medium]",
+    "dimensions": "[Dimensions]",
+    "description": "Placeholder text, a short note about this piece will go here.",
+    "images": [
+      {
+        "src": "/works/snowy-trees/01.jpg",
+        "width": 1440,
+        "height": 1800
+      },
+      {
+        "src": "/works/snowy-trees/02.jpg",
+        "width": 1440,
+        "height": 1800
+      },
+      {
+        "src": "/works/snowy-trees/03.jpg",
+        "width": 1523,
+        "height": 1800
+      },
+      {
+        "src": "/works/snowy-trees/04.jpg",
+        "width": 1350,
+        "height": 1800
+      },
+      {
+        "src": "/works/snowy-trees/05.jpg",
+        "width": 1350,
+        "height": 1800
+      },
+      {
+        "src": "/works/snowy-trees/06.jpg",
+        "width": 1359,
+        "height": 1800
+      }
+    ]
+  },
+  {
     "id": "sprite",
     "title": "Sprite / Cans Trio 2",
     "year": 2026,
@@ -517,6 +557,36 @@ export const artworks: Artwork[] = [
         "src": "/works/sprite/05.jpg",
         "width": 1800,
         "height": 1368
+      }
+    ]
+  },
+  {
+    "id": "summer-sunset",
+    "title": "Summer Sunset",
+    "year": 0,
+    "medium": "[Medium]",
+    "dimensions": "[Dimensions]",
+    "description": "Placeholder text, a short note about this piece will go here.",
+    "images": [
+      {
+        "src": "/works/summer-sunset/01.jpg",
+        "width": 1800,
+        "height": 1799
+      },
+      {
+        "src": "/works/summer-sunset/02.jpg",
+        "width": 1440,
+        "height": 1800
+      },
+      {
+        "src": "/works/summer-sunset/03.jpg",
+        "width": 1439,
+        "height": 1800
+      },
+      {
+        "src": "/works/summer-sunset/04.jpg",
+        "width": 1756,
+        "height": 1800
       }
     ]
   },
