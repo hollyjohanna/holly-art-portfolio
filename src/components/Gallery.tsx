@@ -10,7 +10,7 @@ import { preloadImages } from "@/lib/preload";
 
 export default function Gallery({ artworks }: { artworks: Artwork[] }) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [openingId, setOpeningId] = useState<string | null>(null);
+  const [coverSrcs, setCoverSrcs] = useState<Record<string, string>>({});
   const { ready: assetsReady, registerTotal, reportLoaded } = useLoadingGate();
 
   const totalCovers = artworks.filter((a) => a.images[0]).length;
@@ -66,32 +66,18 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
     [reportLoaded]
   );
 
-  const openArtwork = useCallback(
-    async (id: string) => {
-      if (openingId || activeId) return;
-      const piece = artworks.find((artwork) => artwork.id === id);
-      if (!piece) return;
+  // Open instantly. The modal shows the already-decoded cover straight away
+  // and fades the full-res photo in over it when it arrives.
+  const openArtwork = useCallback((id: string, coverSrc?: string) => {
+    if (coverSrc) {
+      setCoverSrcs((prev) =>
+        prev[id] === coverSrc ? prev : { ...prev, [id]: coverSrc }
+      );
+    }
+    setActiveId(id);
+  }, []);
 
-      setOpeningId(id);
-      try {
-        const index = artworks.indexOf(piece);
-        const neighbours = [
-          piece,
-          artworks[(index - 1 + artworks.length) % artworks.length],
-          artworks[(index + 1) % artworks.length],
-        ];
-        await preloadImages(
-          neighbours.flatMap((artwork) =>
-            artwork.images.map((image) => image.src)
-          )
-        );
-        setActiveId(id);
-      } finally {
-        setOpeningId(null);
-      }
-    },
-    [activeId, artworks, openingId]
-  );
+  const closeArtwork = useCallback(() => setActiveId(null), []);
 
   return (
     <>
@@ -108,11 +94,7 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
           >
             <ArtworkCard
               artwork={artwork}
-              isActive={activeId === artwork.id}
-              enableSharedLayout={activeId === artwork.id}
-              onOpen={() => {
-                void openArtwork(artwork.id);
-              }}
+              onOpen={(coverSrc) => openArtwork(artwork.id, coverSrc)}
               onCoverLoad={() => onCoverLoad(artwork.id)}
             />
           </RevealItem>
@@ -122,7 +104,8 @@ export default function Gallery({ artworks }: { artworks: Artwork[] }) {
       <ArtworkModal
         artworks={artworks}
         activeId={activeId}
-        onClose={() => setActiveId(null)}
+        coverSrcs={coverSrcs}
+        onClose={closeArtwork}
         onNavigate={(id) => setActiveId(id)}
       />
     </>

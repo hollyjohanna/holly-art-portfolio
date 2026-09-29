@@ -50,6 +50,11 @@ export function preloadImages(srcs: string[]): Promise<void> {
   return Promise.all(unique.map(loadOne)).then(() => undefined);
 }
 
+/** Record a src that an on-page <img> finished loading and decoding itself. */
+export function markImageReady(src: string) {
+  ready.add(src);
+}
+
 export function areImagesReady(srcs: string[]): boolean {
   return srcs.filter(Boolean).every((src) => ready.has(src));
 }

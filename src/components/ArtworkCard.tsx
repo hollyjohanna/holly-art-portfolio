@@ -1,22 +1,21 @@
 "use client";
 
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import type { Artwork } from "@/lib/artworks";
 
 export default function ArtworkCard({
   artwork,
-  isActive,
-  enableSharedLayout,
   onOpen,
   onCoverLoad,
 }: {
   artwork: Artwork;
-  isActive: boolean;
-  enableSharedLayout: boolean;
-  onOpen: () => void;
+  /** Receives the URL the browser actually rendered for the cover. */
+  onOpen: (coverSrc?: string) => void;
   onCoverLoad?: () => void;
 }) {
+  const imgRef = useRef<HTMLImageElement>(null);
   const cover = artwork.images[0];
   if (!cover) return null;
 
@@ -24,21 +23,17 @@ export default function ArtworkCard({
     <div>
       <motion.button
         type="button"
-        onClick={onOpen}
+        onClick={() => onOpen(imgRef.current?.currentSrc || undefined)}
         whileTap={{ scale: 0.99 }}
         className="group relative block w-full overflow-hidden border-hairline bg-cream text-left cursor-pointer"
       >
-        <motion.div
-          layoutId={enableSharedLayout ? `art-frame-${artwork.id}` : undefined}
-          className="relative w-full"
-          style={{ opacity: isActive ? 0 : 1 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <div className="relative w-full">
           {/*
             Optimized covers (~viewport width, WebP/AVIF). Animating the full
             1800px JPEGs is what made scroll feels choppy.
           */}
           <Image
+            ref={imgRef}
             src={cover.src}
             alt={artwork.title}
             width={cover.width}
@@ -50,7 +45,7 @@ export default function ArtworkCard({
             draggable={false}
             onLoad={onCoverLoad}
           />
-        </motion.div>
+        </div>
         <div className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/30" />
         <div className="pointer-events-none absolute inset-0 flex flex-col justify-end gap-0.5 p-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
           <span className="label text-cream/90">{artwork.medium}</span>

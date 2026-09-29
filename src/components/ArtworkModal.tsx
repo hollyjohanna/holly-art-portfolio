@@ -7,38 +7,109 @@ import {
   useRef,
   useState,
 } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import type { CSSProperties } from "react";
 import type { Artwork, ArtworkImage } from "@/lib/artworks";
-import { areImagesReady, preloadImages } from "@/lib/preload";
+import { areImagesReady, markImageReady, preloadImages } from "@/lib/preload";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+// Long, soft deceleration for the open: fast off the mark, settles gently.
+const EASE_OPEN = [0.16, 1, 0.3, 1] as const;
+// Quick, even exit so closing never feels sluggish.
+const EASE_CLOSE = [0.4, 0, 0.2, 1] as const;
 const CONTROLS_HIDE_MS = 5000;
 const SLIDE_MS = 0.45;
-const OPEN_MS = 0.55;
+
+const BACKDROP_BLUR = 14;
+const BACKDROP_TINT = "rgba(20, 9, 29, 0.55)";
+
+// Animating the blur radius and tint directly (instead of fading an
+// already-blurred layer's opacity) is what keeps the backdrop from popping.
+const backdropVariants = {
+  hidden: {
+    backgroundColor: "rgba(20, 9, 29, 0)",
+    backdropFilter: "blur(0px)",
+    WebkitBackdropFilter: "blur(0px)",
+    transition: { duration: 0.4, ease: EASE_CLOSE },
+  },
+  shown: {
+    backgroundColor: BACKDROP_TINT,
+    backdropFilter: `blur(${BACKDROP_BLUR}px)`,
+    WebkitBackdropFilter: `blur(${BACKDROP_BLUR}px)`,
+    transition: { duration: 0.6, ease: EASE_OPEN },
+  },
+};
+
+const contentVariants = {
+  enter: { opacity: 0, y: 36, scale: 0.94 },
+  hidden: {
+    opacity: 0,
+    y: 14,
+    scale: 0.985,
+    transition: { duration: 0.3, ease: EASE_CLOSE },
+  },
+  shown: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.75, ease: EASE_OPEN, delay: 0.06 },
+  },
+};
+
+const panelVariants = {
+  hidden: { opacity: 0, y: 12 },
+  shown: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: EASE_OPEN, delay: 0.24 },
+  },
+};
+
+const closeButtonVariants = {
+  hidden: { opacity: 0, scale: 0.85, transition: { duration: 0.2, ease: EASE_CLOSE } },
+  shown: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.45, ease: EASE_OPEN, delay: 0.35 },
+  },
+};
+
+// Work-to-work is a fade-through: the old piece drifts out, then the new one
+// drifts in. Nothing is on screen while the frame changes shape, so a
+// portrait-to-landscape switch never visibly snaps.
+const WORK_SHIFT_PX = 28;
 
 const artworkSlideVariants = {
   enter: (direction: number) => ({
-    x: direction === 0 ? 0 : direction > 0 ? "14%" : "-14%",
+    x: direction === 0 ? 0 : direction > 0 ? WORK_SHIFT_PX : -WORK_SHIFT_PX,
     opacity: direction === 0 ? 1 : 0,
   }),
   center: {
     x: 0,
     opacity: 1,
+    transition: { duration: 0.5, ease: EASE_OPEN },
   },
   exit: (direction: number) => ({
-    x: direction > 0 ? "-14%" : "14%",
+    x: direction > 0 ? -WORK_SHIFT_PX : WORK_SHIFT_PX,
     opacity: 0,
+    transition: { duration: 0.2, ease: [0.4, 0, 1, 1] as const },
   }),
 };
+
+const CLOSE_BUTTON_CLASS =
+  "z-30 items-center justify-center border-hairline bg-cream text-base text-ink/70 shadow-soft transition-colors duration-300 hover:bg-rose/25 hover:text-ink active:translate-y-[1px]";
 
 export default function ArtworkModal({
   artworks,
   activeId,
+  coverSrcs,
   onClose,
   onNavigate,
 }: {
   artworks: Artwork[];
   activeId: string | null;
+  /** Already-decoded gallery cover URLs, shown while full-res photos load. */
+  coverSrcs: Record<string, string>;
   onClose: () => void;
   onNavigate: (id: string) => void;
 }) {
@@ -46,123 +117,61 @@ export default function ArtworkModal({
   const artwork = activeIndex >= 0 ? artworks[activeIndex] : null;
 
   const [artworkDirection, setArtworkDirection] = useState(0);
-  const [sharedElement, setSharedElement] = useState(true);
-  const [photosReady, setPhotosReady] = useState(false);
   const [switchingArtwork, setSwitchingArtwork] = useState(false);
-  const wasOpenRef = useRef(false);
-  const closeAfterSharedRef = useRef(false);
+  // Scrollbars stay hidden while things are moving, so a transform never
+  // flashes one in for a frame or two.
+  const [settling, setSettling] = useState(true);
   const isSwitchingArtworkRef = useRef(false);
 
-  // Never morph/show the modal until this piece's full-res photos are decoded.
+  // Reset so the next open plays the full entrance rather than a slide.
+  const close = useCallback(() => {
+    setArtworkDirection(0);
+    onClose();
+  }, [onClose]);
+
+  // Warm this piece's photos first, then its neighbours, so Prev/Next is instant.
   useEffect(() => {
-    if (!artwork) {
-      setPhotosReady(false);
-      return;
-    }
-
-    let cancelled = false;
-    const srcs = artwork.images.map((image) => image.src);
-
-    if (areImagesReady(srcs)) {
-      setPhotosReady(true);
-      return;
-    }
-
-    setPhotosReady(false);
-    preloadImages(srcs).then(() => {
-      if (!cancelled) setPhotosReady(true);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [artwork]);
-
-  useEffect(() => {
-    if (!activeId) {
-      wasOpenRef.current = false;
-      setArtworkDirection(0);
-      setSharedElement(true);
-      return;
-    }
-
-    if (!photosReady) return;
-
-    const justOpened = !wasOpenRef.current;
-    wasOpenRef.current = true;
-
-    if (justOpened) {
-      setSharedElement(true);
-      setArtworkDirection(0);
-      const t = window.setTimeout(() => setSharedElement(false), OPEN_MS * 1000 + 40);
-      return () => window.clearTimeout(t);
-    }
-
-    setSharedElement(false);
-  }, [activeId, photosReady]);
-
-  useEffect(() => {
-    if (activeIndex < 0 || !photosReady) return;
+    if (activeIndex < 0) return;
+    const current = artworks[activeIndex];
     const neighbours = [
-      artworks[activeIndex],
       artworks[(activeIndex - 1 + artworks.length) % artworks.length],
       artworks[(activeIndex + 1) % artworks.length],
     ];
-    void preloadImages(
-      neighbours.flatMap((piece) => piece.images.map((img) => img.src))
+    void preloadImages(current.images.map((img) => img.src)).then(() =>
+      preloadImages(
+        neighbours.flatMap((piece) => piece.images.map((img) => img.src))
+      )
     );
-  }, [activeIndex, artworks, photosReady]);
+  }, [activeIndex, artworks]);
 
-  const goPrevArtwork = useCallback(async () => {
-    if (activeIndex < 0 || isSwitchingArtworkRef.current) return;
-    isSwitchingArtworkRef.current = true;
-    setSwitchingArtwork(true);
-    const prevIndex = (activeIndex - 1 + artworks.length) % artworks.length;
-    const next = artworks[prevIndex];
-    await preloadImages(next.images.map((image) => image.src));
-    setSharedElement(false);
-    setArtworkDirection(-1);
-    onNavigate(next.id);
-    isSwitchingArtworkRef.current = false;
-    setSwitchingArtwork(false);
-  }, [activeIndex, artworks, onNavigate]);
+  const goToArtwork = useCallback(
+    async (direction: 1 | -1) => {
+      if (activeIndex < 0 || isSwitchingArtworkRef.current) return;
+      isSwitchingArtworkRef.current = true;
+      setSwitchingArtwork(true);
+      const nextIndex =
+        (activeIndex + direction + artworks.length) % artworks.length;
+      const next = artworks[nextIndex];
+      await preloadImages(next.images.map((image) => image.src));
+      setArtworkDirection(direction);
+      onNavigate(next.id);
+      isSwitchingArtworkRef.current = false;
+      setSwitchingArtwork(false);
+    },
+    [activeIndex, artworks, onNavigate]
+  );
 
-  const goNextArtwork = useCallback(async () => {
-    if (activeIndex < 0 || isSwitchingArtworkRef.current) return;
-    isSwitchingArtworkRef.current = true;
-    setSwitchingArtwork(true);
-    const nextIndex = (activeIndex + 1) % artworks.length;
-    const next = artworks[nextIndex];
-    await preloadImages(next.images.map((image) => image.src));
-    setSharedElement(false);
-    setArtworkDirection(1);
-    onNavigate(next.id);
-    isSwitchingArtworkRef.current = false;
-    setSwitchingArtwork(false);
-  }, [activeIndex, artworks, onNavigate]);
-
-  const requestClose = useCallback(() => {
-    closeAfterSharedRef.current = true;
-    setSharedElement(true);
-  }, []);
+  const goPrevArtwork = useCallback(() => goToArtwork(-1), [goToArtwork]);
+  const goNextArtwork = useCallback(() => goToArtwork(1), [goToArtwork]);
 
   useEffect(() => {
-    if (!sharedElement || !closeAfterSharedRef.current) return;
-    closeAfterSharedRef.current = false;
-    const id = requestAnimationFrame(() => {
-      requestAnimationFrame(() => onClose());
-    });
-    return () => cancelAnimationFrame(id);
-  }, [sharedElement, onClose]);
-
-  useEffect(() => {
-    if (!artwork || !photosReady) return;
+    if (!artwork) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") requestClose();
+      if (e.key === "Escape") close();
       if (e.key === "ArrowLeft") void goPrevArtwork();
       if (e.key === "ArrowRight") void goNextArtwork();
     };
@@ -172,126 +181,167 @@ export default function ArtworkModal({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [artwork, photosReady, requestClose, goPrevArtwork, goNextArtwork]);
-
-  const frameLayoutId =
-    artwork && sharedElement && photosReady
-      ? `art-frame-${artwork.id}`
-      : undefined;
-
-  const showModal = Boolean(artwork && photosReady);
+  }, [artwork, close, goPrevArtwork, goNextArtwork]);
 
   return (
-    <AnimatePresence>
-      {showModal && artwork && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35, ease: EASE }}
-          onClick={requestClose}
-          data-lenis-prevent
-          className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain bg-ink/55 backdrop-blur-md"
-        >
-          <div className="flex min-h-full items-center justify-center p-4 py-10 sm:p-8">
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence>
+        {artwork && (
+          <motion.div
+            key="artwork-modal"
+            className="fixed inset-0 z-[100]"
+            initial="hidden"
+            animate="shown"
+            exit="hidden"
+          >
+            <motion.div
+              aria-hidden
+              variants={backdropVariants}
+              className="absolute inset-0"
+            />
+
             <div
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full md:w-auto max-w-6xl"
+              onClick={close}
+              data-lenis-prevent
+              className={`absolute inset-0 overflow-x-hidden overscroll-contain ${
+                settling ? "overflow-y-hidden" : "overflow-y-auto"
+              }`}
             >
-              <button
-                type="button"
-                onClick={requestClose}
-                aria-label="Close"
-                className="fixed top-3 right-3 z-30 flex h-10 w-10 items-center justify-center border-hairline bg-cream text-base text-ink/70 shadow-soft transition-colors duration-300 hover:bg-rose/25 hover:text-ink active:translate-y-[1px] md:absolute md:-top-4 md:-right-4 md:h-9 md:w-9"
-              >
-                ×
-              </button>
-
-              <div className="overflow-hidden">
-                <AnimatePresence mode="popLayout" custom={artworkDirection} initial={false}>
-                  <motion.div
-                    key={artwork.id}
-                    custom={artworkDirection}
-                    variants={artworkSlideVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.4, ease: EASE }}
-                    className="relative flex w-full flex-col md:flex-row md:items-stretch gap-4 md:gap-0"
+              <div className="flex min-h-full items-center justify-center p-4 py-10 sm:p-8">
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative w-full md:w-auto max-w-6xl"
+                >
+                  {/* Mobile: pinned to the screen corner. */}
+                  <motion.button
+                    type="button"
+                    variants={closeButtonVariants}
+                    onClick={close}
+                    aria-label="Close"
+                    className={`fixed top-3 right-3 flex h-10 w-10 md:hidden ${CLOSE_BUTTON_CLASS}`}
                   >
-                    <ArtworkPhotoStage
-                      key={artwork.id}
-                      artwork={artwork}
-                      layoutId={frameLayoutId}
-                    />
+                    ×
+                  </motion.button>
 
-                    <div className="flex w-full md:w-96 flex-shrink-0 flex-col gap-3.5 border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
-                      <div>
-                        <p className="label text-ink/35">
-                          {activeIndex + 1} / {artworks.length}
-                        </p>
-                        <h2 className="mt-2 font-display text-xl leading-snug">
-                          {artwork.title}
-                        </h2>
-                      </div>
-                      <div className="label text-ink/45">
-                        {artwork.year || "[Year]"} &middot; {artwork.medium}
-                      </div>
-                      {artwork.price != null ? (
-                        <div className="text-xs text-ink/45">
-                          ${artwork.price} - contact me to purchase
+                  <motion.div
+                    variants={contentVariants}
+                    initial="enter"
+                    animate="shown"
+                    exit="hidden"
+                    onAnimationStart={() => setSettling(true)}
+                    onAnimationComplete={() => setSettling(false)}
+                  >
+                    <AnimatePresence mode="wait" custom={artworkDirection} initial={false}>
+                      <motion.div
+                        key={artwork.id}
+                        custom={artworkDirection}
+                        variants={artworkSlideVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        onAnimationStart={() => setSettling(true)}
+                        onAnimationComplete={() => setSettling(false)}
+                        className="relative flex w-full flex-col md:flex-row md:items-stretch gap-4 md:gap-0"
+                      >
+                        {/* Desktop: rides along with the piece so it always
+                            sits on the current frame's corner. */}
+                        <motion.button
+                          type="button"
+                          initial={
+                            artworkDirection === 0
+                              ? closeButtonVariants.hidden
+                              : false
+                          }
+                          animate={closeButtonVariants.shown}
+                          onClick={close}
+                          aria-label="Close"
+                          className={`absolute -top-4 -right-4 hidden h-9 w-9 md:flex ${CLOSE_BUTTON_CLASS}`}
+                        >
+                          ×
+                        </motion.button>
+
+                        <ArtworkPhotoStage
+                          key={artwork.id}
+                          artwork={artwork}
+                          coverSrc={coverSrcs[artwork.id]}
+                        />
+
+                        <div className="flex w-full md:w-96 flex-shrink-0 flex-col border-hairline bg-cream p-6 shadow-soft-lg md:min-h-0">
+                          <motion.div
+                            variants={panelVariants}
+                            initial={artworkDirection === 0 ? "hidden" : false}
+                            animate="shown"
+                            className="flex flex-1 flex-col gap-3.5"
+                          >
+                            <div>
+                              <p className="label text-ink/35">
+                                {activeIndex + 1} / {artworks.length}
+                              </p>
+                              <h2 className="mt-2 font-display text-xl leading-snug">
+                                {artwork.title}
+                              </h2>
+                            </div>
+                            <div className="label text-ink/45">
+                              {artwork.year || "[Year]"} &middot; {artwork.medium}
+                            </div>
+                            {artwork.price != null ? (
+                              <div className="text-xs text-ink/45">
+                                ${artwork.price} - contact me to purchase
+                              </div>
+                            ) : null}
+                            <div className="text-xs text-ink/45">{artwork.dimensions}</div>
+                            <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink/65">
+                              {artwork.description}
+                            </p>
+                            <div className="mt-auto flex items-center gap-6 border-t border-rule pt-4">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  void goPrevArtwork();
+                                }}
+                                disabled={switchingArtwork}
+                                className="label text-ink/50 transition-colors duration-300 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+                              >
+                                Prev work
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  void goNextArtwork();
+                                }}
+                                disabled={switchingArtwork}
+                                className="label text-ink/50 transition-colors duration-300 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+                              >
+                                Next work
+                              </button>
+                              {switchingArtwork && (
+                                <span
+                                  aria-hidden
+                                  className="h-3 w-3 flex-shrink-0 animate-spin rounded-full border border-ink/25 border-t-ink/60"
+                                />
+                              )}
+                            </div>
+                          </motion.div>
                         </div>
-                      ) : null}
-                      <div className="text-xs text-ink/45">{artwork.dimensions}</div>
-                      <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink/65">
-                        {artwork.description}
-                      </p>
-                      <div className="mt-auto flex items-center gap-6 border-t border-rule pt-4">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            void goPrevArtwork();
-                          }}
-                          disabled={switchingArtwork}
-                          className="label text-ink/50 transition-colors duration-300 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-                        >
-                          Prev work
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            void goNextArtwork();
-                          }}
-                          disabled={switchingArtwork}
-                          className="label text-ink/50 transition-colors duration-300 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-                        >
-                          Next work
-                        </button>
-                        {switchingArtwork && (
-                          <span
-                            aria-hidden
-                            className="h-3 w-3 flex-shrink-0 animate-spin rounded-full border border-ink/25 border-t-ink/60"
-                          />
-                        )}
-                      </div>
-                    </div>
+                      </motion.div>
+                    </AnimatePresence>
                   </motion.div>
-                </AnimatePresence>
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </MotionConfig>
   );
 }
 
 function ArtworkPhotoStage({
   artwork,
-  layoutId,
+  coverSrc,
 }: {
   artwork: Artwork;
-  layoutId?: string;
+  coverSrc?: string;
 }) {
   const images = artwork.images;
   const hasMultiple = images.length > 1;
@@ -417,29 +467,31 @@ function ArtworkPhotoStage({
   if (!currentImage) return null;
 
   return (
-    <motion.div
-      layoutId={layoutId}
-      transition={{ duration: OPEN_MS, ease: EASE }}
+    <div
       className="relative min-w-0 self-center overflow-hidden bg-cream shadow-soft-lg md:self-stretch"
       onMouseMove={revealControls}
       onMouseEnter={revealControls}
     >
-      {/* Preloaded sizer — same bytes as the visible photo, so the frame
-          has its final size before the open morph runs. */}
-      <img
-        src={currentImage.src}
-        alt=""
+      {/* Sizes the frame to the photo's proportions from its stored
+          dimensions, so it has its final shape on the very first frame
+          instead of snapping open once the photo downloads. */}
+      <div
         aria-hidden
-        width={currentImage.width}
-        height={currentImage.height}
-        decoding="sync"
-        className="pointer-events-none block max-h-[42vh] w-auto max-w-full opacity-0 md:max-h-[85vh]"
+        className="pointer-events-none w-[min(var(--w),calc(var(--r)*42vh),calc(100vw_-_2rem))] md:w-[min(var(--w),calc(var(--r)*85vh),calc(100vw_-_4rem_-_24rem),48rem)]"
+        style={
+          {
+            aspectRatio: `${currentImage.width} / ${currentImage.height}`,
+            "--r": currentImage.width / currentImage.height,
+            "--w": `${currentImage.width}px`,
+          } as CSSProperties
+        }
       />
 
       <div className="absolute inset-0 overflow-hidden">
         {hasMultiple ? (
           <motion.div
             className="flex h-full w-full"
+            initial={false}
             animate={{ x: `${-trackIndex * 100}%` }}
             transition={
               trackInstant
@@ -453,31 +505,25 @@ function ArtworkPhotoStage({
                 key={`${image.src}-${i}`}
                 className="relative flex h-full w-full min-w-full flex-shrink-0 items-center justify-center"
               >
-                <img
-                  src={image.src}
+                <FadeInPhoto
+                  image={image}
+                  placeholderSrc={
+                    image.src === images[0].src ? coverSrc : undefined
+                  }
                   alt={
                     i === trackIndex
-                      ? `${artwork.title} — photo ${imageIndex + 1}`
+                      ? `${artwork.title}, photo ${imageIndex + 1}`
                       : ""
                   }
-                  width={image.width}
-                  height={image.height}
-                  draggable={false}
-                  decoding="sync"
-                  className="max-h-full max-w-full object-contain"
                 />
               </div>
             ))}
           </motion.div>
         ) : (
-          <img
-            src={currentImage.src}
+          <FadeInPhoto
+            image={currentImage}
+            placeholderSrc={coverSrc}
             alt={artwork.title}
-            width={currentImage.width}
-            height={currentImage.height}
-            draggable={false}
-            decoding="sync"
-            className="h-full w-full object-contain"
           />
         )}
       </div>
@@ -535,7 +581,64 @@ function ArtworkPhotoStage({
           </div>
         </motion.div>
       )}
-    </motion.div>
+    </div>
+  );
+}
+
+/**
+ * Full-res photo that fades in over the (already decoded) gallery cover once
+ * it's ready, so the modal never waits on a download and never pops.
+ */
+function FadeInPhoto({
+  image,
+  placeholderSrc,
+  alt,
+}: {
+  image: ArtworkImage;
+  placeholderSrc?: string;
+  alt: string;
+}) {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [ready, setReady] = useState(() => areImagesReady([image.src]));
+
+  useLayoutEffect(() => {
+    const img = imgRef.current;
+    if (!ready && img?.complete && img.naturalWidth > 0) setReady(true);
+  }, [ready]);
+
+  const onLoad = useCallback(() => {
+    const img = imgRef.current;
+    const decoded = img?.decode ? img.decode().catch(() => undefined) : Promise.resolve();
+    void decoded.then(() => {
+      markImageReady(image.src);
+      setReady(true);
+    });
+  }, [image.src]);
+
+  return (
+    <div className="relative h-full w-full">
+      {placeholderSrc && (
+        <img
+          src={placeholderSrc}
+          alt=""
+          aria-hidden
+          draggable={false}
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+      )}
+      <img
+        ref={imgRef}
+        src={image.src}
+        alt={alt}
+        width={image.width}
+        height={image.height}
+        draggable={false}
+        decoding="async"
+        onLoad={onLoad}
+        className="relative h-full w-full object-contain transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        style={{ opacity: ready ? 1 : 0 }}
+      />
+    </div>
   );
 }
 
